@@ -17,12 +17,12 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-export default function Home() {
+export default function Page() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="overflow-hidden">
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-white">
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator
@@ -44,8 +44,8 @@ export default function Home() {
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-6 px-24 py-8">
-          <div className="flex gap-4 justify-between">
+        <div className="flex flex-1 flex-col gap-4 p-4 border-2">
+          <div className="flex gap-4">
             <DiagnosticTestList />
             <PatientList />
           </div>
