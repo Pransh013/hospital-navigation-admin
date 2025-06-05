@@ -15,7 +15,14 @@ import {
 import { sidebarData } from "@/constants";
 import Link from "next/link";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  user?: {
+    name: string;
+    email: string;
+  };
+}
+
+export function AppSidebar({ user, ...props }: AppSidebarProps) {
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -39,7 +46,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={sidebarData.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={sidebarData.user} />
+        {user && (
+          <NavUser
+            user={{
+              name: user.name,
+              email: user.email,
+              avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                user.name
+              )}&background=random`,
+            }}
+          />
+        )}
       </SidebarFooter>
     </Sidebar>
   );

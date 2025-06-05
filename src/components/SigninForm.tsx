@@ -20,12 +20,13 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import {
-  signinSchema,
-  SigninType,
-} from "@/lib/validations";
+import { signinSchema, SigninType } from "@/lib/validations";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { signinAction } from "@/app/actions/auth";
 
 export default function SigninForm() {
+  const router = useRouter();
   const form = useForm<SigninType>({
     resolver: zodResolver(signinSchema),
     defaultValues: {
@@ -34,8 +35,18 @@ export default function SigninForm() {
     },
   });
 
-  function onSubmit(values: SigninType) {
-    console.log(values);
+  async function onSubmit(values: SigninType) {
+    try {
+      const result = await signinAction(values);
+      if (result.success) {
+        router.replace("/");
+        toast.success("Signed in successfully");
+      } else {
+        toast.error(result.error || "Something went wrong");
+      }
+    } catch (err) {
+      toast.error("An unexpected error occurred");
+    }
   }
 
   return (
@@ -84,7 +95,10 @@ export default function SigninForm() {
             </Button>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
-              <Link href="/sign-up" className="underline underline-offset-4">
+              <Link
+                href="/sign-up"
+                className="underline underline-offset-4 text-primary font-semibold"
+              >
                 Sign up
               </Link>
             </div>

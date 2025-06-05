@@ -1,58 +1,39 @@
-import {
-  Bot,
-  SquareTerminal,
-} from "lucide-react";
-
-export const hospitalList = [
-  { value: "city_hospital", label: "City Hospital" },
-  { value: "green_valley_medical", label: "Green Valley Medical" },
-  { value: "sunrise_health_clinic", label: "Sunrise Health Clinic" },
-  { value: "riverdale_general", label: "Riverdale General" },
-];
+import { LayoutDashboard, Stethoscope, Users } from "lucide-react";
 
 export const sidebarData = {
-  user: {
-    name: "Pranshu Verma",
-    email: "pranshuverma@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
+      title: "Dashboard",
+      url: "/",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Manage Patients",
+      url: "/patients",
+      icon: Users,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "Add Patient",
+          url: "/patients/add",
         },
         {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
+          title: "Update Patient",
+          url: "/patients/update",
         },
       ],
     },
     {
-      title: "Models",
-      url: "#",
-      icon: Bot,
+      title: "Manage Doctors",
+      url: "/doctors",
+      icon: Stethoscope,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "Add Doctor",
+          url: "/doctors/add",
         },
         {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
+          title: "Update Doctor",
+          url: "/doctors/update",
         },
       ],
     },
@@ -121,6 +102,8 @@ export const patients = [
   {
     id: "p1",
     name: "Alice Johnson",
+    email: "alice@example.com",
+    gender: "female",
     joinedAt: "09:30 AM",
     date: "2025-05-06",
     test: "ECG",
@@ -128,6 +111,8 @@ export const patients = [
   {
     id: "p2",
     name: "Bob Smith",
+    email: "bob@example.com",
+    gender: "male",
     joinedAt: "10:00 AM",
     date: "2025-05-06",
     test: "TMT",
@@ -135,6 +120,8 @@ export const patients = [
   {
     id: "p3",
     name: "Carol Danvers",
+    email: "carol@example.com",
+    gender: "female",
     joinedAt: "09:45 AM",
     date: "2025-05-06",
     test: "ECG",
@@ -142,6 +129,8 @@ export const patients = [
   {
     id: "p4",
     name: "David Roe",
+    email: "david@example.com",
+    gender: "male",
     joinedAt: "10:15 AM",
     date: "2025-05-06",
     test: "Xray",
@@ -174,7 +163,6 @@ export const patientRecords = [
     doctorAssigned: true,
   },
 ];
-
 
 export type Doctor = {
   id: string;
@@ -257,4 +245,3 @@ export const doctors: Doctor[] = [
     availability: "available",
   },
 ];
-

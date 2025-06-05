@@ -16,11 +16,14 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { getCurrentUserAction } from "@/app/actions/auth";
 
-export default function Home() {
+export default async function Home() {
+  const { user } = await getCurrentUserAction();
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar user={user} />
       <SidebarInset className="overflow-hidden">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-white">
           <div className="flex items-center gap-2 px-4">

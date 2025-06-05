@@ -28,10 +28,12 @@ import {
   SelectValue,
 } from "./ui/select";
 import { signupSchema, SignupType } from "@/lib/validations";
-import { hospitalList } from "@/constants";
 import { useRouter } from "next/navigation";
+import { signupAction } from "@/app/actions/auth";
+import { toast } from "sonner";
+import Hospital from "@/models/hospital";
 
-export default function SignupForm() {
+export default function SignupForm({ hospitals }: { hospitals: Hospital[] }) {
   const router = useRouter();
   const form = useForm<SignupType>({
     resolver: zodResolver(signupSchema),
@@ -41,12 +43,22 @@ export default function SignupForm() {
       email: "",
       password: "",
       hospitalId: "",
+      role: "admin",
     },
   });
 
-  function onSubmit(values: SignupType) {
-    console.log(values);
-    router.push("/")
+  async function onSubmit(values: SignupType) {
+    try {
+      const result = await signupAction(values);
+      if (result.success) {
+        toast.success("Account created successfully!");
+        router.push("/");
+      } else {
+        toast.error(result.error || "Something went wrong");
+      }
+    } catch (err) {
+      toast.error("An unexpected error occurred");
+    }
   }
 
   return (
@@ -133,9 +145,9 @@ export default function SignupForm() {
                         <SelectValue placeholder="Select Hospital" />
                       </SelectTrigger>
                       <SelectContent>
-                        {hospitalList.map(({ value, label }) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
+                        {hospitals.map(({ hospitalName, hospitalId }) => (
+                          <SelectItem key={hospitalId} value={hospitalId}>
+                            {hospitalName}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -150,7 +162,10 @@ export default function SignupForm() {
             </Button>
             <div className="text-center text-sm">
               Already have an account?{" "}
-              <Link href="/sign-in" className="underline underline-offset-4">
+              <Link
+                href="/sign-in"
+                className="underline underline-offset-4 text-primary font-semibold"
+              >
                 Sign in
               </Link>
             </div>
