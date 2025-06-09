@@ -7,7 +7,7 @@ import {
   isValidPassword,
   verifyToken,
 } from "@/lib/authUtils";
-import { createUser, getUserByEmail } from "@/lib/db/userService";
+import { createUser, getUserByEmail } from "@/services/userService";
 import { cookies } from "next/headers";
 import { env } from "@/env/client";
 
@@ -16,6 +16,7 @@ const TOKEN_EXPIRY = 60 * 60;
 
 type AuthResponse = {
   success: boolean;
+  user?: { name: string; email: string; hospitalId: string };
   error?: string;
 };
 
@@ -29,6 +30,7 @@ export async function signupAction(
       userId: user.userId,
       email: user.email,
       role: user.role,
+      hospitalId: user.hospitalId,
     });
 
     (await cookies()).set(AUTH_COOKIE_NAME, token, {
@@ -66,6 +68,7 @@ export async function signinAction(
       userId: user.userId,
       email: user.email,
       role: user.role,
+      hospitalId: user.hospitalId,
     });
 
     (await cookies()).set(AUTH_COOKIE_NAME, token, {
@@ -97,11 +100,7 @@ export async function signoutAction(): Promise<AuthResponse> {
   }
 }
 
-export async function getCurrentUserAction(): Promise<{
-  success: boolean;
-  user?: { name: string; email: string };
-  error?: string;
-}> {
+export async function getCurrentUserAction(): Promise<AuthResponse> {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get(AUTH_COOKIE_NAME)!;
@@ -113,6 +112,7 @@ export async function getCurrentUserAction(): Promise<{
       user: {
         name: `${user.firstName} ${user.lastName}`,
         email: user.email,
+        hospitalId: user.hospitalId,
       },
     };
   } catch (err: any) {

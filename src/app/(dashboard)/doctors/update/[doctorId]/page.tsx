@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,50 +27,80 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getDoctorAction, updateDoctorAction } from "@/app/actions/doctor";
+import { doctorFormSchema, DoctorType } from "@/lib/validations";
 
-const addDoctorSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  designation: z.string().min(1, "Please enter designation"),
-  hospital: z.string().min(1, "Please enter hospital name"),
-  availability: z.enum(["available", "on-leave"], {
-    required_error: "Please select availability",
-  }),
-});
-
-type AddDoctorType = z.infer<typeof addDoctorSchema>;
-
-export default function AddDoctorPage() {
+export default function UpdateDoctorPage() {
   const router = useRouter();
-  const form = useForm<AddDoctorType>({
-    resolver: zodResolver(addDoctorSchema),
+  const params = useParams();
+  const doctorId = params.doctorId as string;
+  const [isLoading, setIsLoading] = useState(true);
+  const form = useForm<DoctorType>({
+    resolver: zodResolver(doctorFormSchema),
     defaultValues: {
       name: "",
       designation: "",
-      hospital: "",
       availability: "available",
     },
   });
 
-  async function onSubmit(values: AddDoctorType) {
-    try {
-      // TODO: Implement the actual API call to add doctor
-      console.log("Adding doctor:", values);
-      toast.success("Doctor added successfully");
-      router.push("/doctors");
-    } catch (err) {
-      toast.error("Failed to add doctor");
+  useEffect(() => {
+    async function fetchDoctor() {
+      try {
+        const { success, doctor, error } = await getDoctorAction(doctorId);
+        if (success && doctor) {
+          form.reset({
+            name: doctor.name,
+            designation: doctor.designation,
+            availability: doctor.availability,
+          });
+        } else {
+          toast.error(error || "Doctor not found");
+          router.push("/doctors");
+        }
+      } catch (error) {
+        toast.error("Failed to fetch doctor");
+        router.push("/doctors");
+      } finally {
+        setIsLoading(false);
+      }
     }
+
+    fetchDoctor();
+  }, [doctorId, form, router]);
+
+  async function onSubmit(values: DoctorType) {
+    try {
+      const { success, error } = await updateDoctorAction(doctorId, values);
+      if (success) {
+        toast.success("Doctor updated successfully");
+        router.push("/doctors");
+      } else {
+        toast.error(error || "Failed to update doctor");
+      }
+    } catch (err) {
+      toast.error("Failed to update doctor");
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="flex justify-center items-center h-[50vh]">
+          <p>Loading doctor details...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="container mx-auto py-8">
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle>Add New Doctor</CardTitle>
-          <CardDescription>
-            Enter doctor details below to add them to the system
-          </CardDescription>
+          <CardTitle>Update Doctor</CardTitle>
+          <CardDescription>Update doctor information below</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -98,20 +127,6 @@ export default function AddDoctorPage() {
                     <FormLabel>Designation</FormLabel>
                     <FormControl>
                       <Input placeholder="Cardiologist" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="hospital"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Hospital</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Apollo Hospital" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -151,7 +166,7 @@ export default function AddDoctorPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Add Doctor</Button>
+                <Button type="submit">Update Doctor</Button>
               </div>
             </form>
           </Form>

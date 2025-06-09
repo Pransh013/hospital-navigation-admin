@@ -15,7 +15,6 @@ export default function DoctorCard({ doctor }: { doctor: Doctor }) {
         <p className={`text-xs font-medium ${availabilityColor}`}>
           {doctor.availability === "available" ? "Available:" : "Unavailable:"}
         </p>
-        <p className="text-xs mb-1 truncate">{doctor.hospital}</p>
       </CardContent>
     </Card>
   );

@@ -1,9 +1,7 @@
 "use client";
 
-import { doctors } from "@/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,66 +27,34 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useRouter, useParams } from "next/navigation";
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { addDoctorAction } from "@/app/actions/doctor";
+import { doctorFormSchema, DoctorType } from "@/lib/validations";
 
-const updateDoctorSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  designation: z.string().min(1, "Please enter designation"),
-  hospital: z.string().min(1, "Please enter hospital name"),
-  availability: z.enum(["available", "on-leave"], {
-    required_error: "Please select availability",
-  }),
-});
-
-type UpdateDoctorType = z.infer<typeof updateDoctorSchema>;
-
-type Doctor = {
-  id: string;
-  name: string;
-  designation: string;
-  hospital: string;
-  availability: "available" | "on-leave";
-};
-
-export default function UpdateDoctorPage() {
+export default function AddDoctorPage() {
   const router = useRouter();
-  const params = useParams();
-  const doctorId = params.id as string;
-
-  const form = useForm<UpdateDoctorType>({
-    resolver: zodResolver(updateDoctorSchema),
+  const form = useForm<DoctorType>({
+    resolver: zodResolver(doctorFormSchema),
     defaultValues: {
       name: "",
       designation: "",
-      hospital: "",
       availability: "available",
     },
   });
 
-  useEffect(() => {
-    const doctor = doctors.find((d) => d.id === doctorId) as Doctor;
-    if (doctor) {
-      form.reset({
-        name: doctor.name,
-        designation: doctor.designation,
-        hospital: doctor.hospital,
-        availability: doctor.availability,
-      });
-    } else {
-      toast.error("Doctor not found");
-      router.push("/doctors");
-    }
-  }, [doctorId, form, router]);
-
-  async function onSubmit(values: UpdateDoctorType) {
+  async function onSubmit(values: DoctorType) {
     try {
-      // TODO: Implement the actual API call to update doctor
-      console.log("Updating doctor:", values);
-      toast.success("Doctor updated successfully");
-      router.push("/doctors");
+      const response = await addDoctorAction(values);
+
+      if (response.success) {
+        toast.success("Doctor added successfully");
+        form.reset();
+        router.push("/doctors");
+      } else {
+        toast.error(response.error || "Failed to add doctor");
+      }
     } catch (err) {
-      toast.error("Failed to update doctor");
+      toast.error("Failed to add doctor");
     }
   }
 
@@ -96,8 +62,10 @@ export default function UpdateDoctorPage() {
     <div className="container mx-auto py-8">
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle>Update Doctor</CardTitle>
-          <CardDescription>Update doctor information below</CardDescription>
+          <CardTitle>Add New Doctor</CardTitle>
+          <CardDescription>
+            Enter doctor details below to add them to the system
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -124,20 +92,6 @@ export default function UpdateDoctorPage() {
                     <FormLabel>Designation</FormLabel>
                     <FormControl>
                       <Input placeholder="Cardiologist" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="hospital"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Hospital</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Apollo Hospital" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -177,7 +131,7 @@ export default function UpdateDoctorPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Update Doctor</Button>
+                <Button type="submit">Add Doctor</Button>
               </div>
             </form>
           </Form>

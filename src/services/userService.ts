@@ -2,7 +2,7 @@ import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import dbClient, { usersTable } from "@/lib/db/dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import { User } from "@/models/user";
-import { SignupType } from "../validations";
+import { SignupType } from "../lib/validations";
 
 export const createUser = async (user: SignupType) => {
   const now = new Date().toISOString();

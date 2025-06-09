@@ -168,80 +168,68 @@ export type Doctor = {
   id: string;
   name: string;
   designation: string;
-  hospital: string;
   availability: "available" | "on-leave";
 };
 
-// constants/doctors.ts
 export const doctors: Doctor[] = [
   {
     id: "d1",
     name: "Dr. Anjali Mehra",
     designation: "Cardiologist",
-    hospital: "Apollo Hospital",
     availability: "available",
   },
   {
     id: "d2",
     name: "Dr. Rakesh Yadav",
     designation: "Radiologist",
-    hospital: "Fortis Hospital",
     availability: "on-leave",
   },
   {
     id: "d3",
     name: "Dr. Sneha Roy",
     designation: "Neurologist",
-    hospital: "AIIMS",
     availability: "available",
   },
   {
     id: "d4",
     name: "Dr. Vishal Gupta",
     designation: "Orthopedic",
-    hospital: "Max Healthcare",
     availability: "available",
   },
   {
     id: "d5",
     name: "Dr. Farah Khan",
     designation: "Pathologist",
-    hospital: "Medanta",
     availability: "on-leave",
   },
   {
     id: "d6",
     name: "Dr. Alok Verma",
     designation: "Cardiologist",
-    hospital: "Apollo Hospital",
     availability: "available",
   },
   {
     id: "d7",
     name: "Dr. Priya Nair",
     designation: "Radiologist",
-    hospital: "Fortis Hospital",
     availability: "available",
   },
   {
     id: "d8",
     name: "Dr. Rohit Sharma",
     designation: "Orthopedic",
-    hospital: "AIIMS",
     availability: "on-leave",
   },
   {
     id: "d9",
     name: "Dr. Meenakshi Das",
     designation: "Neurologist",
-    hospital: "Max Healthcare",
     availability: "available",
   },
   {
     id: "d10",
     name: "Dr. Harsh Singh",
     designation: "Pathologist",
-    hospital: "Medanta",
     availability: "available",
   },
 ];

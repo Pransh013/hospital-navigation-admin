@@ -7,7 +7,7 @@ const JWT_SECRET = env.JWT_SECRET!;
 const SALT_ROUNDS = 10;
 const TOKEN_EXPIRY_SECONDS = 60 * 60;
 
-type TokenPayload = Pick<User, "userId" | "email" | "role">;
+type TokenPayload = Pick<User, "userId" | "email" | "role" | "hospitalId">;
 
 const secretKey = new TextEncoder().encode(JWT_SECRET);
 

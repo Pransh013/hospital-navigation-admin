@@ -1,3 +1,4 @@
+import Doctor from "@/models/doctor";
 import { z } from "zod";
 
 export const signupSchema = z.object({
@@ -21,3 +22,25 @@ export const signinSchema = z.object({
 });
 
 export type SigninType = z.infer<typeof signinSchema>;
+
+export const doctorFormSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  designation: z.string().min(1, "Please enter designation"),
+  availability: z.enum(["available", "on-leave"], {
+    required_error: "Please select availability",
+  }),
+});
+
+export type DoctorType = z.infer<typeof doctorFormSchema>;
+
+export type DoctorResponse = {
+  success: boolean;
+  error?: string;
+  doctor?: Doctor;
+};
+
+export type GetDoctorsResponse = {
+  success: boolean;
+  error?: string;
+  doctors?: Doctor[];
+};
