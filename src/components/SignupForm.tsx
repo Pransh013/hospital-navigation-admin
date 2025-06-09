@@ -27,29 +27,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { signupSchema, SignupType } from "@/lib/validations";
+import { adminSignupSchema, AdminSignupType } from "@/lib/validations";
 import { useRouter } from "next/navigation";
-import { signupAction } from "@/app/actions/auth";
+import { adminSignupAction } from "@/app/actions/admin";
 import { toast } from "sonner";
 import Hospital from "@/models/hospital";
 
 export default function SignupForm({ hospitals }: { hospitals: Hospital[] }) {
   const router = useRouter();
-  const form = useForm<SignupType>({
-    resolver: zodResolver(signupSchema),
+  const form = useForm<AdminSignupType>({
+    resolver: zodResolver(adminSignupSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
       email: "",
       password: "",
       hospitalId: "",
-      role: "admin",
     },
   });
 
-  async function onSubmit(values: SignupType) {
+  async function onSubmit(values: AdminSignupType) {
     try {
-      const result = await signupAction(values);
+      const result = await adminSignupAction(values);
       if (result.success) {
         toast.success("Account created successfully!");
         router.push("/");
@@ -118,6 +117,7 @@ export default function SignupForm({ hospitals }: { hospitals: Hospital[] }) {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="password"
@@ -131,6 +131,7 @@ export default function SignupForm({ hospitals }: { hospitals: Hospital[] }) {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="hospitalId"
@@ -157,8 +158,13 @@ export default function SignupForm({ hospitals }: { hospitals: Hospital[] }) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full cursor-pointer">
-              Signup
+
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? "Signing up..." : "Signup"}
             </Button>
             <div className="text-center text-sm">
               Already have an account?{" "}

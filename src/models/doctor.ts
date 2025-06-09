@@ -1,4 +1,4 @@
-interface Doctor {
+export default interface Doctor {
   doctorId: string;
   name: string;
   designation: string;
@@ -7,5 +7,3 @@ interface Doctor {
   createdAt: string;
   updatedAt: string;
 }
-
-export default Doctor;

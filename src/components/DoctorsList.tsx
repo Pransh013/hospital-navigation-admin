@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import Doctor from "@/models/doctor"
+import Doctor from "@/models/doctor";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,19 +15,18 @@ import {
 import Link from "next/link";
 
 const DoctorsList = ({ doctors }: { doctors: Doctor[] }) => {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedAvailability, setSelectedAvailability] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedAvailability, setSelectedAvailability] = useState("all");
 
-    const filteredDoctors = doctors.filter((doctor) => {
-      const matchesSearch =
-        doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doctor.designation.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesAvailability =
-        selectedAvailability === "all" ||
-        doctor.availability === selectedAvailability;
-      return matchesSearch && matchesAvailability;
-    });
-
+  const filteredDoctors = doctors.filter((doctor) => {
+    const matchesSearch = doctor.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesAvailability =
+      selectedAvailability === "all" ||
+      doctor.availability === selectedAvailability;
+    return matchesSearch && matchesAvailability;
+  });
 
   return (
     <>
@@ -107,6 +106,6 @@ const DoctorsList = ({ doctors }: { doctors: Doctor[] }) => {
       </div>
     </>
   );
-}
+};
 
-export default DoctorsList
+export default DoctorsList;

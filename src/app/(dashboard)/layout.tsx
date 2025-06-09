@@ -13,17 +13,18 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { getCurrentUserAction } from "@/app/actions/auth";
+import { getCurrentAdminAction } from "@/app/actions/admin";
 
 export default async function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-    const { user } = await getCurrentUserAction();
+  const { admin } = await getCurrentAdminAction();
+
   return (
     <SidebarProvider>
-      <AppSidebar user={user} />
+      <AppSidebar user={admin} />
       <SidebarInset className="overflow-hidden">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-white">
           <div className="flex items-center gap-2 px-4">

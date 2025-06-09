@@ -1,9 +1,7 @@
 "use client";
 
-import { diagnosticTests, patients } from "@/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,67 +28,93 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useRouter, useParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getPatientAction, updatePatientAction } from "@/app/actions/patient";
+import { z } from "zod";
 
 const updatePatientSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Please enter a valid email address"),
   gender: z.enum(["male", "female", "other"], {
     required_error: "Please select a gender",
   }),
-  test: z.string().min(1, "Please select a test"),
+  contactNumber: z
+    .string()
+    .min(10, "Contact number must be at least 10 digits"),
+  address: z.string().min(1, "Address is required"),
 });
 
 type UpdatePatientType = z.infer<typeof updatePatientSchema>;
 
-type Patient = {
-  id: string;
-  name: string;
-  email: string;
-  gender: "male" | "female" | "other";
-  joinedAt: string;
-  date: string;
-  test: string;
-};
-
 export default function UpdatePatientPage() {
-    const router = useRouter();
-    const params = useParams();
-    const patientId = params.id as string;
+  const router = useRouter();
+  const params = useParams();
+  const patientId = params.patientId as string;
+  const [isLoading, setIsLoading] = useState(true);
+
   const form = useForm<UpdatePatientType>({
     resolver: zodResolver(updatePatientSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       gender: "male",
-      test: "",
+      contactNumber: "",
+      address: "",
     },
   });
 
   useEffect(() => {
-    const patient = patients.find((p) => p.id === patientId) as Patient;
-    if (patient) {
-      form.reset({
-        name: patient.name,
-        email: patient.email,
-        gender: patient.gender,
-        test: patient.test,
-      });
-    } else {
-      toast.error("Patient not found");
-      router.push("/patients");
+    async function fetchPatient() {
+      try {
+        const { success, patient, error } = await getPatientAction(patientId);
+        if (success && patient) {
+          form.reset({
+            firstName: patient.firstName,
+            lastName: patient.lastName,
+            email: patient.email,
+            gender: patient.gender,
+            contactNumber: patient.contactNumber,
+            address: patient.address,
+          });
+        } else {
+          toast.error(error || "Patient not found");
+          router.push("/patients");
+        }
+      } catch (error) {
+        toast.error("Failed to fetch patient");
+        router.push("/patients");
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }, [params.id, form, router]);
+
+    fetchPatient();
+  }, [patientId, form, router]);
 
   async function onSubmit(values: UpdatePatientType) {
     try {
-      // TODO: Implement the actual API call to update patient
-      console.log("Updating patient:", values);
-      toast.success("Patient updated successfully");
-      router.push("/patients");
+      const { success, error } = await updatePatientAction(patientId, values);
+      if (success) {
+        toast.success("Patient updated successfully");
+        router.push("/patients");
+      } else {
+        toast.error(error || "Failed to update patient");
+      }
     } catch (err) {
       toast.error("Failed to update patient");
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="flex justify-center items-center h-[50vh]">
+          <p>Loading patient details...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -103,30 +127,45 @@ export default function UpdatePatientPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Patient Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex gap-4">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email Address</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="john.doe@example.com"
                         type="email"
+                        placeholder="john@example.com"
                         {...field}
                       />
                     </FormControl>
@@ -163,27 +202,27 @@ export default function UpdatePatientPage() {
 
               <FormField
                 control={form.control}
-                name="test"
+                name="contactNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Diagnostic Test</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a test" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {diagnosticTests.map((test) => (
-                          <SelectItem key={test.id} value={test.name}>
-                            {test.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Contact Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="9876543210" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="123 Main St, City" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -15,8 +15,7 @@ export default async function DoctorsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-semibold mb-6">Doctors</h1>
+    <div className="container mx-auto py-8 px-24">
       <DoctorsList doctors={doctors || []} />
     </div>
   );

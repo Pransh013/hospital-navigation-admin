@@ -1,6 +1,5 @@
 "use server";
 
-import { SigninType, SignupType } from "@/lib/validations";
 import {
   generateToken,
   hashPassword,
@@ -9,36 +8,42 @@ import {
 } from "@/lib/authUtils";
 import { createUser, getUserByEmail } from "@/services/userService";
 import { cookies } from "next/headers";
-import { env } from "@/env/client";
+import { AdminSigninType, AdminSignupType } from "@/lib/validations";
+import Admin from "@/models/admin";
 
 const AUTH_COOKIE_NAME = "auth_token";
 const TOKEN_EXPIRY = 60 * 60;
 
 type AuthResponse = {
   success: boolean;
-  user?: { name: string; email: string; hospitalId: string };
+  admin?: { name: string; email: string; hospitalId: string };
   error?: string;
 };
 
-export async function signupAction(
-  formData: SignupType
+async function createTokenAndSetCookie(
+  user: Pick<Admin, "adminId" | "email" | "hospitalId">
+) {
+  const token = await generateToken(user);
+  (await cookies()).set(AUTH_COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: TOKEN_EXPIRY,
+    path: "/",
+  });
+}
+
+export async function adminSignupAction(
+  formData: AdminSignupType
 ): Promise<AuthResponse> {
   try {
     const passwordHash = await hashPassword(formData.password);
     const user = await createUser({ ...formData, password: passwordHash });
-    const token = await generateToken({
-      userId: user.userId,
-      email: user.email,
-      role: user.role,
-      hospitalId: user.hospitalId,
-    });
 
-    (await cookies()).set(AUTH_COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: env.NEXT_PUBLIC_ENVIRONMENT === "production",
-      sameSite: "lax",
-      maxAge: TOKEN_EXPIRY,
-      path: "/",
+    await createTokenAndSetCookie({
+      adminId: user.adminId,
+      email: user.email,
+      hospitalId: user.hospitalId,
     });
 
     return { success: true };
@@ -50,8 +55,8 @@ export async function signupAction(
   }
 }
 
-export async function signinAction(
-  formData: SigninType
+export async function adminSigninAction(
+  formData: AdminSigninType
 ): Promise<AuthResponse> {
   try {
     const user = await getUserByEmail(formData.email);
@@ -64,19 +69,10 @@ export async function signinAction(
       };
     }
 
-    const token = await generateToken({
-      userId: user.userId,
+    await createTokenAndSetCookie({
+      adminId: user.adminId,
       email: user.email,
-      role: user.role,
       hospitalId: user.hospitalId,
-    });
-
-    (await cookies()).set(AUTH_COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: env.NEXT_PUBLIC_ENVIRONMENT === "production",
-      sameSite: "lax",
-      maxAge: TOKEN_EXPIRY,
-      path: "/",
     });
 
     return { success: true };
@@ -88,7 +84,7 @@ export async function signinAction(
   }
 }
 
-export async function signoutAction(): Promise<AuthResponse> {
+export async function adminSignoutAction(): Promise<AuthResponse> {
   try {
     (await cookies()).delete(AUTH_COOKIE_NAME);
     return { success: true };
@@ -100,25 +96,23 @@ export async function signoutAction(): Promise<AuthResponse> {
   }
 }
 
-export async function getCurrentUserAction(): Promise<AuthResponse> {
+export async function getCurrentAdminAction(): Promise<AuthResponse> {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get(AUTH_COOKIE_NAME)!;
+    const token = cookieStore.get(AUTH_COOKIE_NAME);
+    if (!token) throw new Error("No auth token found");
     const decoded = await verifyToken(token.value);
     const user = await getUserByEmail(decoded.email);
 
     return {
       success: true,
-      user: {
+      admin: {
         name: `${user.firstName} ${user.lastName}`,
         email: user.email,
         hospitalId: user.hospitalId,
       },
     };
   } catch (err: any) {
-    return {
-      success: false,
-      error: "Failed to get user data. Please try again.",
-    };
+    throw new Error("Failed to get user data. Please try again.");
   }
 }

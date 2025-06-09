@@ -26,7 +26,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-import { signoutAction } from "@/app/actions/auth";
+import { adminSignoutAction } from "@/app/actions/admin";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -44,7 +44,7 @@ export function NavUser({
 
   const handleSignout = async () => {
     try {
-      const result = await signoutAction();
+      const result = await adminSignoutAction();
       if (result.success) {
         toast.success("Signed out successfully");
         router.push("/sign-in");

@@ -1,6 +1,5 @@
 "use client";
 
-import { diagnosticTests } from "@/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -30,14 +29,19 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { createPatientAction } from "@/app/actions/patient";
 
 const addPatientSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Please enter a valid email address"),
   gender: z.enum(["male", "female", "other"], {
     required_error: "Please select a gender",
   }),
-  test: z.string().min(1, "Please select a test"),
+  contactNumber: z
+    .string()
+    .min(10, "Contact number must be at least 10 digits"),
+  address: z.string().min(1, "Address is required"),
 });
 
 type AddPatientType = z.infer<typeof addPatientSchema>;
@@ -47,19 +51,25 @@ export default function AddPatientPage() {
   const form = useForm<AddPatientType>({
     resolver: zodResolver(addPatientSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       gender: "male",
-      test: "",
+      contactNumber: "",
+      address: "",
     },
   });
 
   async function onSubmit(values: AddPatientType) {
     try {
-      // TODO: Implement the actual API call to add patient
-      console.log("Adding patient:", values);
-      toast.success("Patient added successfully");
-      router.push("/patients");
+      const {success, error} = await createPatientAction(values)
+      if (success) {
+        toast.success("Patient added successfully");
+        form.reset();
+        router.push("/patients");
+      } else {
+        toast.error(error || "Failed to add patient");
+      }
     } catch (err) {
       toast.error("Failed to add patient");
     }
@@ -77,19 +87,34 @@ export default function AddPatientPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Patient Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex gap-4">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John" {...field} type="text" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Doe" {...field} type="text" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
@@ -137,27 +162,27 @@ export default function AddPatientPage() {
 
               <FormField
                 control={form.control}
-                name="test"
+                name="contactNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Diagnostic Test</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a test" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {diagnosticTests.map((test) => (
-                          <SelectItem key={test.id} value={test.name}>
-                            {test.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Contact Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="9876543210" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="123 Main St, City" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

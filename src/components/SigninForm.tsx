@@ -20,24 +20,24 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import { signinSchema, SigninType } from "@/lib/validations";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { signinAction } from "@/app/actions/auth";
+import { adminSigninSchema, AdminSigninType } from "@/lib/validations";
+import { adminSigninAction } from "@/app/actions/admin";
 
 export default function SigninForm() {
   const router = useRouter();
-  const form = useForm<SigninType>({
-    resolver: zodResolver(signinSchema),
+  const form = useForm<AdminSigninType>({
+    resolver: zodResolver(adminSigninSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  async function onSubmit(values: SigninType) {
+  async function onSubmit(values: AdminSigninType) {
     try {
-      const result = await signinAction(values);
+      const result = await adminSigninAction(values);
       if (result.success) {
         router.replace("/");
         toast.success("Signed in successfully");
@@ -90,8 +90,12 @@ export default function SigninForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full cursor-pointer">
-              Signin
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? "Signing in..." : "Signin"}
             </Button>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}

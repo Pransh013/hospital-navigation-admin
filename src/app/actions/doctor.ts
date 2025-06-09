@@ -8,16 +8,20 @@ import {
   QueryCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { getCurrentUserAction } from "@/app/actions/auth";
-import { DoctorResponse, DoctorType, GetDoctorsResponse } from "@/lib/validations";
+import { getCurrentAdminAction } from "@/app/actions/admin";
+import {
+  DoctorResponse,
+  DoctorType,
+  GetDoctorsResponse,
+} from "@/lib/validations";
 import { v4 as uuidv4 } from "uuid";
 
 export async function addDoctorAction(
   data: DoctorType
 ): Promise<DoctorResponse> {
   try {
-    const { success, user } = await getCurrentUserAction();
-    if (!success || !user?.hospitalId) {
+    const { success, admin } = await getCurrentAdminAction();
+    if (!success || !admin?.hospitalId) {
       return {
         success: false,
         error: "Hospital ID not found",
@@ -29,7 +33,7 @@ export async function addDoctorAction(
       doctorId: uuidv4(),
       name: data.name,
       designation: data.designation,
-      hospitalId: user.hospitalId,
+      hospitalId: admin.hospitalId,
       availability: data.availability,
       createdAt: now,
       updatedAt: now,
@@ -44,7 +48,6 @@ export async function addDoctorAction(
 
     return {
       success: true,
-      doctor: doctorData,
     };
   } catch (error: any) {
     return {
@@ -56,8 +59,8 @@ export async function addDoctorAction(
 
 export async function getDoctorsAction(): Promise<GetDoctorsResponse> {
   try {
-    const { success, user } = await getCurrentUserAction();
-    if (!success || !user?.hospitalId) {
+    const { success, admin } = await getCurrentAdminAction();
+    if (!success || !admin?.hospitalId) {
       return {
         success: false,
         error: "Hospital ID not found",
@@ -70,7 +73,7 @@ export async function getDoctorsAction(): Promise<GetDoctorsResponse> {
         IndexName: "hospitalId-index",
         KeyConditionExpression: "hospitalId = :hospitalId",
         ExpressionAttributeValues: {
-          ":hospitalId": user.hospitalId,
+          ":hospitalId": admin.hospitalId,
         },
       })
     );

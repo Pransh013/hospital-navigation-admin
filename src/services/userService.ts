@@ -1,17 +1,33 @@
-import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import dbClient, { usersTable } from "@/lib/db/dynamodb";
+import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import dbClient, { adminsTable } from "@/lib/db/dynamodb";
 import { v4 as uuidv4 } from "uuid";
-import { User } from "@/models/user";
-import { SignupType } from "../lib/validations";
+import User from "@/models/admin";
+import { AdminSignupType } from "../lib/validations";
 
-export const createUser = async (user: SignupType) => {
+export const createUser = async (user: AdminSignupType) => {
+  const existingUserParams = {
+    TableName: adminsTable,
+    IndexName: "email-index",
+    KeyConditionExpression: "email = :email",
+    ExpressionAttributeValues: {
+      ":email": user.email,
+    },
+  };
+
+  const existingUsers = await dbClient.send(
+    new QueryCommand(existingUserParams)
+  );
+
+  if (existingUsers.Count && existingUsers.Count > 0) {
+    throw new Error("Email already registered");
+  }
+
   const now = new Date().toISOString();
 
   const newUser: User = {
-    userId: uuidv4(),
+    adminId: uuidv4(),
     email: user.email,
     passwordHash: user.password,
-    role: user.role,
     firstName: user.firstName,
     lastName: user.lastName,
     hospitalId: user.hospitalId,
@@ -20,30 +36,32 @@ export const createUser = async (user: SignupType) => {
   };
 
   const params = {
-    TableName: usersTable,
+    TableName: adminsTable,
     Item: newUser,
-    ConditionExpression: "attribute_not_exists(email)",
   };
 
   try {
     await dbClient.send(new PutCommand(params));
     return newUser;
   } catch (error: any) {
-    if (error.name === "ConditionalCheckFailedException") {
-      throw new Error("Email already registered");
-    }
     throw error;
   }
 };
 
 export const getUserByEmail = async (email: string) => {
   const params = {
-    TableName: usersTable,
-    Key: { email },
+    TableName: adminsTable,
+    IndexName: "email-index", // Replace with your actual GSI name
+    KeyConditionExpression: "email = :email",
+    ExpressionAttributeValues: {
+      ":email": email,
+    },
+    Limit: 1,
   };
-  const { Item } = await dbClient.send(new GetCommand(params));
-  if (!Item) {
+  const { Items } = await dbClient.send(new QueryCommand(params));
+
+  if (!Items || Items.length === 0) {
     throw new Error("User not found");
   }
-  return Item as User;
+  return Items[0] as User;
 };

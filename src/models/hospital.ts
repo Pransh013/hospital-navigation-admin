@@ -1,4 +1,4 @@
-interface Hospital {
+export default interface Hospital {
   hospitalId: string;
   hospitalName: string;
   address?: string;
@@ -6,5 +6,3 @@ interface Hospital {
   createdAt: string;
   updatedAt: string;
 }
-
-export default Hospital;

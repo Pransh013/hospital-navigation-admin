@@ -1,13 +1,13 @@
 import bcrypt from "bcryptjs";
 import { env } from "@/env/server";
-import { User } from "@/models/user";
+import Admin from "@/models/admin";
 import { jwtVerify, SignJWT } from "jose";
 
 const JWT_SECRET = env.JWT_SECRET!;
 const SALT_ROUNDS = 10;
-const TOKEN_EXPIRY_SECONDS = 60 * 60;
+const TOKEN_EXPIRY_SECONDS = 60 * 60 * 24 * 7;
 
-type TokenPayload = Pick<User, "userId" | "email" | "role" | "hospitalId">;
+type TokenPayload = Pick<Admin, "adminId" | "email" | "hospitalId">;
 
 const secretKey = new TextEncoder().encode(JWT_SECRET);
 

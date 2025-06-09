@@ -1,8 +1,7 @@
-export interface User {
-  userId: string;
+export default interface Admin {
+  adminId: string;
   email: string;
   passwordHash: string;
-  role: "admin" | "patient";
   firstName: string;
   lastName: string;
   hospitalId: string;
