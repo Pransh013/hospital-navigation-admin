@@ -29,27 +29,13 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { createPatientAction } from "@/app/actions/patient";
-
-const addPatientSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Please enter a valid email address"),
-  gender: z.enum(["male", "female", "other"], {
-    required_error: "Please select a gender",
-  }),
-  contactNumber: z
-    .string()
-    .min(10, "Contact number must be at least 10 digits"),
-  address: z.string().min(1, "Address is required"),
-});
-
-type AddPatientType = z.infer<typeof addPatientSchema>;
+import { createPatientAction } from "@/actions/patient";
+import { patientFormSchema, PatientFormType } from "@/lib/validations";
 
 export default function AddPatientPage() {
   const router = useRouter();
-  const form = useForm<AddPatientType>({
-    resolver: zodResolver(addPatientSchema),
+  const form = useForm<PatientFormType>({
+    resolver: zodResolver(patientFormSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -60,9 +46,9 @@ export default function AddPatientPage() {
     },
   });
 
-  async function onSubmit(values: AddPatientType) {
+  async function onSubmit(values: PatientFormType) {
     try {
-      const {success, error} = await createPatientAction(values)
+      const { success, error } = await createPatientAction(values);
       if (success) {
         toast.success("Patient added successfully");
         form.reset();

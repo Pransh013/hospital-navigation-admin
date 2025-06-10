@@ -29,15 +29,15 @@ import {
 import { toast } from "sonner";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getDoctorAction, updateDoctorAction } from "@/app/actions/doctor";
-import { doctorFormSchema, DoctorType } from "@/lib/validations";
+import { getDoctorAction, updateDoctorAction } from "@/actions/doctor";
+import { doctorFormSchema, DoctorFormType } from "@/lib/validations";
 
 export default function UpdateDoctorPage() {
   const router = useRouter();
   const params = useParams();
   const doctorId = params.doctorId as string;
   const [isLoading, setIsLoading] = useState(true);
-  const form = useForm<DoctorType>({
+  const form = useForm<DoctorFormType>({
     resolver: zodResolver(doctorFormSchema),
     defaultValues: {
       name: "",
@@ -49,7 +49,7 @@ export default function UpdateDoctorPage() {
   useEffect(() => {
     async function fetchDoctor() {
       try {
-        const { success, doctor, error } = await getDoctorAction(doctorId);
+        const { success, data: doctor, error } = await getDoctorAction(doctorId);
         if (success && doctor) {
           form.reset({
             name: doctor.name,
@@ -71,7 +71,7 @@ export default function UpdateDoctorPage() {
     fetchDoctor();
   }, [doctorId, form, router]);
 
-  async function onSubmit(values: DoctorType) {
+  async function onSubmit(values: DoctorFormType) {
     try {
       const { success, error } = await updateDoctorAction(doctorId, values);
       if (success) {

@@ -13,7 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { getCurrentAdminAction } from "@/app/actions/admin";
+import { getCurrentAdminAction } from "@/actions/admin";
 
 export default async function DashboardLayout({
   children,

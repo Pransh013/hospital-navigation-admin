@@ -29,7 +29,7 @@ import {
 } from "./ui/select";
 import { adminSignupSchema, AdminSignupType } from "@/lib/validations";
 import { useRouter } from "next/navigation";
-import { adminSignupAction } from "@/app/actions/admin";
+import { adminSignupAction } from "@/actions/admin";
 import { toast } from "sonner";
 import Hospital from "@/models/hospital";
 

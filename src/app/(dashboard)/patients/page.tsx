@@ -1,14 +1,14 @@
-import { getPatientsAction } from "@/app/actions/patient";
+import { getPatientsAction } from "@/actions/patient";
 import PatientsList from "@/components/PatientsList";
 
 export default async function PatientsPage() {
-  const patients = await getPatientsAction();
+  const { success, data: patients, error } = await getPatientsAction();
 
-  if (!Array.isArray(patients)) {
+  if (!success) {
     return (
       <div className="container mx-auto py-8">
         <p className="text-center text-red-500">
-          {patients.error || "Failed to load patients"}
+          {error || "Failed to load patients"}
         </p>
       </div>
     );

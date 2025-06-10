@@ -26,7 +26,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-import { adminSignoutAction } from "@/app/actions/admin";
+import { adminSignoutAction } from "@/actions/admin";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 

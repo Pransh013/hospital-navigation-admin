@@ -1,5 +1,3 @@
-import Doctor from "@/models/doctor";
-import Patient from "@/models/patient";
 import { z } from "zod";
 
 export const adminSignupSchema = z.object({
@@ -31,25 +29,14 @@ export const doctorFormSchema = z.object({
   }),
 });
 
-export type DoctorType = z.infer<typeof doctorFormSchema>;
-
-export type DoctorResponse = {
-  success: boolean;
-  error?: string;
-  doctor?: Doctor;
-};
-
-export type GetDoctorsResponse = {
-  success: boolean;
-  error?: string;
-  doctors?: Doctor[];
-};
+export type DoctorFormType = z.infer<typeof doctorFormSchema>;
 
 export const patientFormSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Please enter a valid email address"),
   gender: z.enum(["male", "female", "other"], {
-    required_error: "Please select gender",
+    required_error: "Please select a gender",
   }),
   contactNumber: z
     .string()
@@ -57,16 +44,10 @@ export const patientFormSchema = z.object({
   address: z.string().min(1, "Address is required"),
 });
 
-export type PatientType = z.infer<typeof patientFormSchema>;
+export type PatientFormType = z.infer<typeof patientFormSchema>;
 
-export interface PatientResponse {
+export type ActionResponse<T> = {
   success: boolean;
-  patient?: Patient;
+  data?: T;
   error?: string;
-}
-
-export interface GetPatientsResponse {
-  success: boolean;
-  patients?: Patient[];
-  error?: string;
-}
+};

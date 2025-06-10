@@ -57,6 +57,7 @@ const DoctorsList = ({ doctors }: { doctors: Doctor[] }) => {
           </Select>
         </div>
       </div>
+      
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filteredDoctors.length === 0 ? (
           <p className="text-center text-muted-foreground col-span-full">

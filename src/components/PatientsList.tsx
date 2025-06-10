@@ -14,11 +14,11 @@ import { useState } from "react";
 import Link from "next/link";
 import Patient from "@/models/patient";
 
-interface PatientListProps {
+export default function PatientsList({
+  patients = [],
+}: {
   patients: Patient[];
-}
-
-export default function PatientsList({ patients = [] }: PatientListProps) {
+}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGender, setSelectedGender] = useState("all");
 
@@ -31,7 +31,7 @@ export default function PatientsList({ patients = [] }: PatientListProps) {
   });
 
   return (
-    <div className="container mx-auto py-8">
+    <>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Patients</h1>
         <div className="flex gap-4">
@@ -106,6 +106,6 @@ export default function PatientsList({ patients = [] }: PatientListProps) {
           ))
         )}
       </div>
-    </div>
+    </>
   );
 }

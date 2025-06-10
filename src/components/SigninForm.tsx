@@ -23,7 +23,7 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { adminSigninSchema, AdminSigninType } from "@/lib/validations";
-import { adminSigninAction } from "@/app/actions/admin";
+import { adminSigninAction } from "@/actions/admin";
 
 export default function SigninForm() {
   const router = useRouter();

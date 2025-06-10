@@ -28,12 +28,12 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { addDoctorAction } from "@/app/actions/doctor";
-import { doctorFormSchema, DoctorType } from "@/lib/validations";
+import { addDoctorAction } from "@/actions/doctor";
+import { doctorFormSchema, DoctorFormType } from "@/lib/validations";
 
 export default function AddDoctorPage() {
   const router = useRouter();
-  const form = useForm<DoctorType>({
+  const form = useForm<DoctorFormType>({
     resolver: zodResolver(doctorFormSchema),
     defaultValues: {
       name: "",
@@ -42,7 +42,7 @@ export default function AddDoctorPage() {
     },
   });
 
-  async function onSubmit(values: DoctorType) {
+  async function onSubmit(values: DoctorFormType) {
     try {
       const response = await addDoctorAction(values);
 

@@ -29,23 +29,8 @@ import {
 import { toast } from "sonner";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getPatientAction, updatePatientAction } from "@/app/actions/patient";
-import { z } from "zod";
-
-const updatePatientSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Please enter a valid email address"),
-  gender: z.enum(["male", "female", "other"], {
-    required_error: "Please select a gender",
-  }),
-  contactNumber: z
-    .string()
-    .min(10, "Contact number must be at least 10 digits"),
-  address: z.string().min(1, "Address is required"),
-});
-
-type UpdatePatientType = z.infer<typeof updatePatientSchema>;
+import { getPatientAction, updatePatientAction } from "@/actions/patient";
+import { patientFormSchema, PatientFormType } from "@/lib/validations";
 
 export default function UpdatePatientPage() {
   const router = useRouter();
@@ -53,8 +38,8 @@ export default function UpdatePatientPage() {
   const patientId = params.patientId as string;
   const [isLoading, setIsLoading] = useState(true);
 
-  const form = useForm<UpdatePatientType>({
-    resolver: zodResolver(updatePatientSchema),
+  const form = useForm<PatientFormType>({
+    resolver: zodResolver(patientFormSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -68,7 +53,11 @@ export default function UpdatePatientPage() {
   useEffect(() => {
     async function fetchPatient() {
       try {
-        const { success, patient, error } = await getPatientAction(patientId);
+        const {
+          success,
+          data: patient,
+          error,
+        } = await getPatientAction(patientId);
         if (success && patient) {
           form.reset({
             firstName: patient.firstName,
@@ -93,7 +82,7 @@ export default function UpdatePatientPage() {
     fetchPatient();
   }, [patientId, form, router]);
 
-  async function onSubmit(values: UpdatePatientType) {
+  async function onSubmit(values: PatientFormType) {
     try {
       const { success, error } = await updatePatientAction(patientId, values);
       if (success) {

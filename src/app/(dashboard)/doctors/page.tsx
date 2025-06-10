@@ -1,8 +1,8 @@
-import { getDoctorsAction } from "@/app/actions/doctor";
+import { getDoctorsAction } from "@/actions/doctor";
 import DoctorsList from "@/components/DoctorsList";
 
 export default async function DoctorsPage() {
-  const { success, doctors, error } = await getDoctorsAction();
+  const { success, data: doctors, error } = await getDoctorsAction();
 
   if (!success) {
     return (
