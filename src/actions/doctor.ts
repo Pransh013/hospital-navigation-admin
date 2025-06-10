@@ -9,7 +9,7 @@ export async function addDoctorAction(
   data: DoctorFormType
 ): Promise<ActionResponse<void>> {
   try {
-    const { success, admin } = await getCurrentAdminAction();
+    const { success, data: admin } = await getCurrentAdminAction();
     if (!success || !admin?.hospitalId) {
       return { success: false, error: "Hospital ID not found" };
     }
@@ -23,7 +23,7 @@ export async function addDoctorAction(
 
 export async function getDoctorsAction(): Promise<ActionResponse<Doctor[]>> {
   try {
-    const { success, admin } = await getCurrentAdminAction();
+    const { success, data: admin } = await getCurrentAdminAction();
     if (!success || !admin?.hospitalId) {
       return { success: false, error: "Hospital ID not found" };
     }

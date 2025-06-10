@@ -2,17 +2,16 @@
 
 import { adminService } from "@/services/adminService";
 import { authService } from "@/services/authService";
-import { AdminSigninType, AdminSignupType } from "@/lib/validations";
-
-type AuthResponse = {
-  success: boolean;
-  admin?: { name: string; email: string; hospitalId: string };
-  error?: string;
-};
+import {
+  ActionResponse,
+  AdminSigninType,
+  AdminSignupType,
+} from "@/lib/validations";
+import Admin from "@/models/admin";
 
 export async function adminSignupAction(
   formData: AdminSignupType
-): Promise<Pick<AuthResponse, "success" | "error">> {
+): Promise<ActionResponse<void>> {
   try {
     const newUser = await adminService.createNew(formData);
     await authService.createAuthCookie(newUser);
@@ -24,7 +23,7 @@ export async function adminSignupAction(
 
 export async function adminSigninAction(
   formData: AdminSigninType
-): Promise<Pick<AuthResponse, "success" | "error">> {
+): Promise<ActionResponse<void>> {
   try {
     const user = await authService.verifyCredentials(formData);
     await authService.createAuthCookie(user);
@@ -34,9 +33,7 @@ export async function adminSigninAction(
   }
 }
 
-export async function adminSignoutAction(): Promise<
-  Pick<AuthResponse, "success" | "error">
-> {
+export async function adminSignoutAction(): Promise<ActionResponse<void>> {
   try {
     authService.clearAuthCookie();
     return { success: true };
@@ -45,12 +42,14 @@ export async function adminSignoutAction(): Promise<
   }
 }
 
-export async function getCurrentAdminAction(): Promise<AuthResponse> {
+export async function getCurrentAdminAction(): Promise<
+  ActionResponse<Pick<Admin, "email" | "hospitalId"> & { name: string }>
+> {
   try {
     const user = await authService.getCurrentAdmin();
     return {
       success: true,
-      admin: {
+      data: {
         name: `${user.firstName} ${user.lastName}`,
         email: user.email,
         hospitalId: user.hospitalId,

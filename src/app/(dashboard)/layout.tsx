@@ -20,7 +20,7 @@ export default async function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { admin } = await getCurrentAdminAction();
+  const { data: admin } = await getCurrentAdminAction();
 
   return (
     <SidebarProvider>

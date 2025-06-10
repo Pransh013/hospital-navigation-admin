@@ -3,7 +3,7 @@ import { env } from "@/env/server";
 import Admin from "@/models/admin";
 import { jwtVerify, SignJWT } from "jose";
 
-const JWT_SECRET = env.JWT_SECRET!;
+const JWT_SECRET = env.JWT_SECRET;
 const SALT_ROUNDS = 10;
 const TOKEN_EXPIRY_SECONDS = 60 * 60 * 24 * 7;
 
