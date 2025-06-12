@@ -4,23 +4,6 @@ import Admin from "@/models/admin";
 import { AdminSignupType } from "@/lib/validations";
 import { hashPassword } from "@/lib/authUtils";
 
-const createAdminData = (
-  adminData: AdminSignupType,
-  passwordHash: string
-): Admin => {
-  const now = new Date().toISOString();
-  return {
-    adminId: uuidv4(),
-    email: adminData.email,
-    passwordHash: passwordHash,
-    firstName: adminData.firstName,
-    lastName: adminData.lastName,
-    hospitalId: adminData.hospitalId,
-    createdAt: now,
-    updatedAt: now,
-  };
-};
-
 export const adminService = {
   createNew: async (adminData: AdminSignupType): Promise<Admin> => {
     const existingAdmin = await adminRepository.findByEmail(adminData.email);
@@ -29,7 +12,17 @@ export const adminService = {
     }
 
     const passwordHash = await hashPassword(adminData.password);
-    const newAdmin = createAdminData(adminData, passwordHash);
+    const now = new Date().toISOString();
+    const newAdmin: Admin = {
+      adminId: uuidv4(),
+      email: adminData.email,
+      passwordHash: passwordHash,
+      firstName: adminData.firstName,
+      lastName: adminData.lastName,
+      hospitalId: adminData.hospitalId,
+      createdAt: now,
+      updatedAt: now,
+    };
 
     await adminRepository.create(newAdmin);
     return newAdmin;

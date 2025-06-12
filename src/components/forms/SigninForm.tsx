@@ -19,7 +19,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
+} from "../ui/form";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { adminSigninSchema, AdminSigninType } from "@/lib/validations";

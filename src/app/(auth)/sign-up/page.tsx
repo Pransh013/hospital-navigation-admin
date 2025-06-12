@@ -1,4 +1,4 @@
-import SignupForm from "@/components/SignupForm";
+import SignupForm from "@/components/forms/SignupForm";
 import { getAllHospitalsAction } from "@/actions/hospital";
 
 export default async function Signup() {

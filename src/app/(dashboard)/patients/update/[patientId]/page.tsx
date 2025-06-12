@@ -30,13 +30,25 @@ import { toast } from "sonner";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getPatientAction, updatePatientAction } from "@/actions/patient";
+import { getTestsByHospitalAction } from "@/actions/test";
+import {
+  getPatientTestsAction,
+  assignPatientTestsAction,
+  removePatientTestAction,
+} from "@/actions/patientTest";
 import { patientFormSchema, PatientFormType } from "@/lib/validations";
+import Test from "@/models/test";
 
 export default function UpdatePatientPage() {
   const router = useRouter();
   const params = useParams();
   const patientId = params.patientId as string;
   const [isLoading, setIsLoading] = useState(true);
+  const [availableTests, setAvailableTests] = useState<Test[]>([]);
+  const [selectedTests, setSelectedTests] = useState<string[]>([]);
+
+  console.log("available", availableTests);
+  console.log("selected", selectedTests);
 
   const form = useForm<PatientFormType>({
     resolver: zodResolver(patientFormSchema),
@@ -47,18 +59,32 @@ export default function UpdatePatientPage() {
       gender: "male",
       contactNumber: "",
       address: "",
+      tests: [],
     },
   });
 
   useEffect(() => {
-    async function fetchPatient() {
+    async function fetchData() {
       try {
         const {
-          success,
+          success: patientSuccess,
           data: patient,
-          error,
+          error: patientError,
         } = await getPatientAction(patientId);
-        if (success && patient) {
+
+        const {
+          success: testsSuccess,
+          data: tests,
+          error: testsError,
+        } = await getTestsByHospitalAction();
+
+        const {
+          success: assignedTestsSuccess,
+          data: assignedTestsData,
+          error: assignedTestsError,
+        } = await getPatientTestsAction(patientId);
+
+        if (patientSuccess && patient) {
           form.reset({
             firstName: patient.firstName,
             lastName: patient.lastName,
@@ -68,29 +94,74 @@ export default function UpdatePatientPage() {
             address: patient.address,
           });
         } else {
-          toast.error(error || "Patient not found");
+          toast.error(patientError || "Patient not found");
           router.push("/patients");
         }
+
+        if (testsSuccess && tests) {
+          setAvailableTests(tests);
+        } else {
+          toast.error(testsError || "Failed to load tests");
+        }
+
+        if (assignedTestsSuccess && assignedTestsData) {
+          setSelectedTests(assignedTestsData.map((test) => test.testId));
+        } else {
+          toast.error(assignedTestsError || "Failed to load assigned tests");
+        }
       } catch (error) {
-        toast.error("Failed to fetch patient");
+        toast.error("Failed to fetch data");
         router.push("/patients");
       } finally {
         setIsLoading(false);
       }
     }
 
-    fetchPatient();
+    fetchData();
   }, [patientId, form, router]);
 
   async function onSubmit(values: PatientFormType) {
     try {
       const { success, error } = await updatePatientAction(patientId, values);
-      if (success) {
-        toast.success("Patient updated successfully");
-        router.push("/patients");
-      } else {
+      if (!success) {
         toast.error(error || "Failed to update patient");
+        return;
       }
+
+      const { data: initialTests } = await getPatientTestsAction(patientId);
+      const initialTestIds = initialTests?.map((test) => test.testId) || [];
+
+      const testsToAdd = selectedTests.filter(
+        (testId) => !initialTestIds.includes(testId)
+      );
+
+      const testsToRemove = initialTestIds.filter(
+        (testId) => !selectedTests.includes(testId)
+      );
+
+      if (testsToAdd.length > 0) {
+        const { success: addSuccess, error: addError } =
+          await assignPatientTestsAction({
+            patientId,
+            testIds: testsToAdd,
+          });
+        if (!addSuccess) {
+          toast.error(addError || "Failed to add some tests");
+          return;
+        }
+      }
+
+      for (const testId of testsToRemove) {
+        const { success: removeSuccess, error: removeError } =
+          await removePatientTestAction(patientId, testId);
+        if (!removeSuccess) {
+          toast.error(removeError || "Failed to remove some tests");
+          return;
+        }
+      }
+
+      toast.success("Patient updated successfully");
+      router.push("/patients");
     } catch (err) {
       toast.error("Failed to update patient");
     }
@@ -111,7 +182,9 @@ export default function UpdatePatientPage() {
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Update Patient</CardTitle>
-          <CardDescription>Update patient information below</CardDescription>
+          <CardDescription>
+            Update patient information and manage their tests
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -153,9 +226,9 @@ export default function UpdatePatientPage() {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
-                        type="email"
                         placeholder="john@example.com"
                         {...field}
+                        type="email"
                       />
                     </FormControl>
                     <FormMessage />
@@ -196,7 +269,7 @@ export default function UpdatePatientPage() {
                   <FormItem>
                     <FormLabel>Contact Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="9876543210" {...field} />
+                      <Input placeholder="+1234567890" {...field} type="tel" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -210,12 +283,61 @@ export default function UpdatePatientPage() {
                   <FormItem>
                     <FormLabel>Address</FormLabel>
                     <FormControl>
-                      <Input placeholder="123 Main St, City" {...field} />
+                      <Input placeholder="123 Main St" {...field} type="text" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Test Management</h3>
+                <FormField
+                  control={form.control}
+                  name="tests"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Assign Tests</FormLabel>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        {availableTests.map((test) => (
+                          <div
+                            key={test.testId}
+                            className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-accent cursor-pointer"
+                          >
+                            <Input
+                              type="checkbox"
+                              className="h-4 w-4"
+                              value={test.testId}
+                              checked={selectedTests.includes(test.testId)}
+                              onChange={(e) => {
+                                const testId = e.target.value;
+                                if (e.target.checked) {
+                                  const newSelectedTests = [
+                                    ...selectedTests,
+                                    testId,
+                                  ];
+                                  setSelectedTests(newSelectedTests);
+                                  form.setValue("tests", newSelectedTests);
+                                } else {
+                                  const newSelectedTests = selectedTests.filter(
+                                    (id) => id !== testId
+                                  );
+                                  setSelectedTests(newSelectedTests);
+                                  form.setValue("tests", newSelectedTests);
+                                }
+                              }}
+                            />
+                            <span className="text-sm font-medium">
+                              {test.name}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <div className="flex justify-end gap-4">
                 <Button

@@ -19,14 +19,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
+} from "../ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "../ui/select";
 import { adminSignupSchema, AdminSignupType } from "@/lib/validations";
 import { useRouter } from "next/navigation";
 import { adminSignupAction } from "@/actions/admin";

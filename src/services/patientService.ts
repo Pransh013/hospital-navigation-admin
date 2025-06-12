@@ -8,7 +8,7 @@ export const patientService = {
   createNew: async (
     data: PatientFormType,
     hospitalId: string
-  ): Promise<void> => {
+  ): Promise<string> => {
     const existingPatient = await patientRepository.findByEmail(data.email);
     if (existingPatient) {
       throw new Error("Email already registered");
@@ -33,6 +33,7 @@ export const patientService = {
     };
 
     await patientRepository.create(patient);
+    return patient.patientId
   },
 
   getById: async (patientId: string): Promise<Patient | null> => {

@@ -7,15 +7,18 @@ import Patient from "@/models/patient";
 
 export async function createPatientAction(
   formData: PatientFormType
-): Promise<ActionResponse<void>> {
+): Promise<ActionResponse<string>> {
   try {
     const { success, data: admin } = await getCurrentAdminAction();
     if (!success || !admin?.hospitalId) {
       return { success: false, error: "Hospital ID not found" };
     }
 
-    await patientService.createNew(formData, admin.hospitalId);
-    return { success: true };
+    const patientId = await patientService.createNew(
+      formData,
+      admin.hospitalId
+    );
+    return { success: true, data: patientId };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to add patient" };
   }
