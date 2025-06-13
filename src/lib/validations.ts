@@ -1,3 +1,4 @@
+import Admin from "@/models/admin";
 import { z } from "zod";
 
 export const adminSignupSchema = z.object({
@@ -67,3 +68,5 @@ export type ActionResponse<T> = {
   data?: T;
   error?: string;
 };
+
+export type TokenPayload = Pick<Admin, "adminId" | "email" | "hospitalId">;

@@ -1,15 +1,10 @@
 import bcrypt from "bcryptjs";
 import { env } from "@/env/server";
-import Admin from "@/models/admin";
 import { jwtVerify, SignJWT } from "jose";
+import { SALT_ROUNDS, TOKEN_EXPIRY_SECONDS } from "@/constants";
+import { TokenPayload } from "./validations";
 
-const JWT_SECRET = env.JWT_SECRET;
-const SALT_ROUNDS = 10;
-const TOKEN_EXPIRY_SECONDS = 60 * 60 * 24 * 7;
-
-type TokenPayload = Pick<Admin, "adminId" | "email" | "hospitalId">;
-
-const secretKey = new TextEncoder().encode(JWT_SECRET);
+const secretKey = new TextEncoder().encode(env.JWT_SECRET);
 
 export const generateToken = async (user: TokenPayload): Promise<string> => {
   return await new SignJWT(user)

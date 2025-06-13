@@ -3,9 +3,7 @@ import { generateToken, isValidPassword, verifyToken } from "@/lib/authUtils";
 import { adminService } from "./adminService";
 import { AdminSigninType } from "@/lib/validations";
 import Admin from "@/models/admin";
-
-const AUTH_COOKIE_NAME = "auth_token";
-const TOKEN_EXPIRY = 60 * 60 * 24 * 7; // 7 days in seconds
+import { AUTH_COOKIE_NAME, TOKEN_EXPIRY_SECONDS } from "@/constants";
 
 export const authService = {
   verifyCredentials: async (credentials: AdminSigninType): Promise<Admin> => {
@@ -29,7 +27,7 @@ export const authService = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: TOKEN_EXPIRY,
+      maxAge: TOKEN_EXPIRY_SECONDS,
       path: "/",
     });
   },

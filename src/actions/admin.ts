@@ -35,7 +35,7 @@ export async function adminSigninAction(
 
 export async function adminSignoutAction(): Promise<ActionResponse<void>> {
   try {
-    authService.clearAuthCookie();
+    await authService.clearAuthCookie();
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Signout failed" };

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/authUtils";
+import { AUTH_COOKIE_NAME } from "./constants";
 
-const AUTH_COOKIE_NAME = "auth_token";
 const publicPaths = ["/sign-in", "/sign-up"];
 
 export async function middleware(request: NextRequest) {

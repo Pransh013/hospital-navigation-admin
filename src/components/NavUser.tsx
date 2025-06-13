@@ -44,12 +44,12 @@ export function NavUser({
 
   const handleSignout = async () => {
     try {
-      const result = await adminSignoutAction();
-      if (result.success) {
+      const { success, error } = await adminSignoutAction();
+      if (success) {
+        router.replace("/sign-in");
         toast.success("Signed out successfully");
-        router.push("/sign-in");
       } else {
-        toast.error(result.error || "Failed to sign out");
+        toast.error(error || "Failed to sign out");
       }
     } catch (err) {
       toast.error("An unexpected error occurred");
