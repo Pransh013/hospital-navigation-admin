@@ -148,33 +148,6 @@ export const patients = [
   },
 ];
 
-export const patientRecords = [
-  {
-    id: "P001",
-    name: "Alice Johnson",
-    testName: "ECG",
-    date: "2025-05-06",
-    reportUploaded: true,
-    doctorAssigned: true,
-  },
-  {
-    id: "P002",
-    name: "Bob Smith",
-    testName: "TMT",
-    date: "2025-05-06",
-    reportUploaded: false,
-    doctorAssigned: false,
-  },
-  {
-    id: "P003",
-    name: "Carol Danvers",
-    testName: "Xray",
-    date: "2025-05-05",
-    reportUploaded: true,
-    doctorAssigned: true,
-  },
-];
-
 export type Doctor = {
   id: string;
   name: string;

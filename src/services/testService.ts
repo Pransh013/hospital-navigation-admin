@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { testRepository } from "@/repositories/testRepository";
+import { testStatusService } from "@/services/testStatusService";
 import Test from "@/models/test";
 import { TestFormType } from "@/lib/validations";
 
@@ -19,6 +20,7 @@ export const testService = {
     };
 
     await testRepository.create(newTest);
+    await testStatusService.initializeTestStatus(newTest.testId, hospitalId);
     return newTest;
   },
 
