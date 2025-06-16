@@ -68,7 +68,7 @@ export default function AddPatientForm({ tests }: { tests: Test[] }) {
       } else {
         toast.error(error || "Failed to add patient");
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to add patient");
     }
   }

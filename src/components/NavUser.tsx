@@ -51,7 +51,7 @@ export function NavUser({
       } else {
         toast.error(error || "Failed to sign out");
       }
-    } catch (err) {
+    } catch {
       toast.error("An unexpected error occurred");
     }
   };

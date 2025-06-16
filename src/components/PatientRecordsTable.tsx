@@ -76,7 +76,7 @@ export default function PatientRecordsTable() {
         const patientTestsResults = await Promise.all(patientTestsPromises);
         const allRecords = patientTestsResults.flat();
         setRecords(allRecords);
-      } catch (error) {
+      } catch {
         toast.error("Failed to load patient records");
       } finally {
         setIsLoading(false);
@@ -93,6 +93,7 @@ export default function PatientRecordsTable() {
   function handleAssignDoctor(patientId: string, testId: string) {
     setSelectedPatientId(patientId);
     setDialogOpen(true);
+    console.log("Doctor assigned for:", patientId, testId);
   }
 
   if (isLoading) {

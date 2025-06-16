@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
       try {
         await verifyToken(token);
         return NextResponse.redirect(new URL("/", request.url));
-      } catch (error) {
+      } catch {
         // If token is invalid, allow access to public paths
         return NextResponse.next();
       }
@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
     // Verify token but don't redirect on success - let the layout handle admin checks
     await verifyToken(token);
     return NextResponse.next();
-  } catch (error) {
+  } catch {
     // If token is invalid, redirect to sign-in
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }

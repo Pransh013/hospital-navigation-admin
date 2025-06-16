@@ -80,7 +80,7 @@ export default function PatientsByTests() {
         }, {} as Record<string, Array<{ patient: Patient; patientTest: PatientTest }>>);
 
         setPatientsByTest(groupedPatients);
-      } catch (error) {
+      } catch {
         toast.error("Failed to load data");
       } finally {
         setIsLoading(false);

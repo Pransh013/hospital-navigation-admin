@@ -44,7 +44,7 @@ export default function SigninForm() {
       } else {
         toast.error(result.error || "Something went wrong");
       }
-    } catch (err) {
+    } catch {
       toast.error("An unexpected error occurred");
     }
   }
