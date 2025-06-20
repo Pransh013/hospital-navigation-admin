@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import Link from "next/link";
-import Patient from "@/models/patient";
+import { Patient } from "@/models/patient";
 
 export default function PatientsList({
   patients = [],

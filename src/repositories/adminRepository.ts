@@ -1,6 +1,6 @@
 import dbClient, { adminsTable } from "@/lib/db/dynamodb";
+import { Admin } from "@/models/admin";
 import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import Admin from "@/models/admin";
 
 export const adminRepository = {
   create: async (admin: Admin): Promise<void> => {

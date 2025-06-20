@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import { patientTestRepository } from "@/repositories/patientTestRepository";
-import { testStatusService } from "@/services/testStatusService";
+import { testRepository } from "@/repositories/testRepository";
 import { getCurrentAdminAction } from "@/actions/admin";
-import PatientTest from "@/models/patientTest";
+import { PatientTest } from "@/models/patientTest";
 
 export const patientTestService = {
   assignTests: async (testIds: string[], patientId: string): Promise<void> => {
@@ -17,7 +17,8 @@ export const patientTestService = {
       patientTestId: uuidv4(),
       patientId,
       testId,
-      status: "pending",
+      hospitalId: admin.hospitalId,
+      status: "assigned",
       createdAt: now,
       updatedAt: now,
     }));
@@ -25,7 +26,7 @@ export const patientTestService = {
     await patientTestRepository.createMany(patientTestRecords);
 
     for (const testId of testIds) {
-      await testStatusService.incrementWaitingCount(testId, admin.hospitalId);
+      await testRepository.incrementPatientsWaiting(testId);
     }
   },
 
@@ -39,6 +40,28 @@ export const patientTestService = {
       throw new Error("Hospital ID not found");
     }
     await patientTestRepository.delete(patientId, testId);
-    await testStatusService.decrementWaitingCount(testId, admin.hospitalId);
+    await testRepository.decrementPatientsWaiting(testId);
+  },
+
+  getPatientTestsByHospitalId: async (
+    hospitalId: string
+  ): Promise<PatientTest[]> => {
+    return patientTestRepository.findByHospitalId(hospitalId);
+  },
+
+  scheduleConsultation: async (
+    patientTestId: string,
+    consultationSlotId: string
+  ): Promise<void> => {
+    // Fetch the patient test
+    const patientTest = await patientTestRepository.findById(patientTestId);
+    if (!patientTest) throw new Error("Patient test not found");
+    if (patientTest.consultationSlotId)
+      throw new Error("Consultation already scheduled for this test");
+    await patientTestRepository.update(patientTestId, {
+      consultationSlotId,
+      status: "consultation_scheduled",
+      updatedAt: new Date().toISOString(),
+    });
   },
 };

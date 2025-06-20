@@ -4,19 +4,17 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DiagnosticTestCard } from "./DiagnosticTestCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getHospitalTestStatusesAction } from "@/actions/testStatus";
 import { getTestsByHospitalAction } from "@/actions/test";
 import { getCurrentAdminAction } from "@/actions/admin";
 import { toast } from "sonner";
-import Test from "@/models/test";
-import TestStatus from "@/models/testStatus";
+import { Test } from "@/models/test";
 
 const PAGE_SIZE = 4;
 
 export default function DiagnosticTestList() {
   const [page, setPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [tests, setTests] = useState<Array<Test & { status: TestStatus }>>([]);
+  const [tests, setTests] = useState<Test[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -43,33 +41,7 @@ export default function DiagnosticTestList() {
           return;
         }
 
-        // Get test statuses
-        const {
-          success: statusSuccess,
-          data: statusData,
-          error: statusError,
-        } = await getHospitalTestStatusesAction(admin.hospitalId);
-        if (!statusSuccess || !statusData) {
-          toast.error(statusError || "Failed to load test statuses");
-          return;
-        }
-
-        // Combine test data with status
-        const combinedData = testsData.map((test) => {
-          const status = statusData.find((s) => s.testId === test.testId);
-          return {
-            ...test,
-            status: status || {
-              testId: test.testId,
-              hospitalId: admin.hospitalId,
-              status: "active",
-              patientsWaiting: 0,
-              updatedAt: new Date().toISOString(),
-            },
-          };
-        });
-
-        setTests(combinedData);
+        setTests(testsData);
       } catch (error) {
         toast.error("Failed to load diagnostic tests");
       } finally {
@@ -138,8 +110,8 @@ export default function DiagnosticTestList() {
             test={{
               id: test.testId,
               name: test.name,
-              patientsWaiting: test.status.patientsWaiting,
-              status: test.status.status,
+              patientsWaiting: test.patientsWaiting,
+              status: test.status,
             }}
           />
         ))}

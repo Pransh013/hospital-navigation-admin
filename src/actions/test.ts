@@ -3,7 +3,7 @@
 import { testService } from "@/services/testService";
 import { getCurrentAdminAction } from "@/actions/admin";
 import { ActionResponse, TestFormType } from "@/lib/validations";
-import Test from "@/models/test";
+import { Test } from "@/models/test";
 
 export async function createTestAction(
   formData: TestFormType

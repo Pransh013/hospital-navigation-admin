@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { verifyToken } from "@/lib/authUtils";
 import { AUTH_COOKIE_NAME } from "./constants";
 

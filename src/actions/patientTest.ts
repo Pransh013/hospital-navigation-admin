@@ -2,7 +2,8 @@
 
 import { patientTestService } from "@/services/patientTestService";
 import { ActionResponse } from "@/lib/validations";
-import PatientTest from "@/models/patientTest";
+import { PatientTest } from "@/models/patientTest";
+import { getCurrentAdminAction } from "@/actions/admin";
 
 type AssignTestsInput = {
   patientId: string;
@@ -44,5 +45,43 @@ export async function removePatientTestAction(
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to remove test." };
+  }
+}
+
+export async function getPatientTestsByHospitalAction(): Promise<
+  ActionResponse<PatientTest[]>
+> {
+  try {
+    const { success, data: admin } = await getCurrentAdminAction();
+    if (!success || !admin?.hospitalId) {
+      return { success: false, error: "Hospital ID not found" };
+    }
+    const tests = await patientTestService.getPatientTestsByHospitalId(
+      admin.hospitalId
+    );
+    return { success: true, data: tests };
+  } catch (err: any) {
+    return {
+      success: false,
+      error: err.message || "Failed to fetch patient tests by hospital.",
+    };
+  }
+}
+
+export async function scheduleConsultationAction(
+  patientTestId: string,
+  consultationSlotId: string
+): Promise<ActionResponse<null>> {
+  try {
+    await patientTestService.scheduleConsultation(
+      patientTestId,
+      consultationSlotId
+    );
+    return { success: true };
+  } catch (err: any) {
+    return {
+      success: false,
+      error: err.message || "Failed to schedule consultation.",
+    };
   }
 }

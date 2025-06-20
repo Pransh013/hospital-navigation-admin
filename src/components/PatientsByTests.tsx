@@ -13,9 +13,9 @@ import { getPatientsAction } from "@/actions/patient";
 import { getPatientTestsAction } from "@/actions/patientTest";
 import { getTestsByHospitalAction } from "@/actions/test";
 import { toast } from "sonner";
-import Patient from "@/models/patient";
-import PatientTest from "@/models/patientTest";
-import Test from "@/models/test";
+import { Patient } from "@/models/patient";
+import { PatientTest } from "@/models/patientTest";
+import { Test } from "@/models/test";
 
 export default function PatientsByTests() {
   const [selectedTest, setSelectedTest] = useState<string>("");

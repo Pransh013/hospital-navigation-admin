@@ -1,6 +1,6 @@
 import dbClient, { hospitalsTable } from "@/lib/db/dynamodb";
+import { Hospital } from "@/models/hospital";
 import { ScanCommand } from "@aws-sdk/lib-dynamodb";
-import Hospital from "@/models/hospital";
 
 const HOSPITAL_PROJECTION = "hospitalId, hospitalName";
 

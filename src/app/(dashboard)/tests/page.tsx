@@ -19,6 +19,7 @@ export default async function TestPage() {
                 <th className="p-2">Price</th>
                 <th className="p-2">Floor No.</th>
                 <th className="p-2">Room No.</th>
+                <th className="p-2">Status</th>
                 <th className="p-2">Created at</th>
               </tr>
             </thead>
@@ -29,6 +30,7 @@ export default async function TestPage() {
                   <td className="p-2">₹{test.price}</td>
                   <td className="p-2">{test.floorNumber}</td>
                   <td className="p-2">{test.roomNumber}</td>
+                  <td className="p-2">{test.status}</td>
                   <td className="p-2">
                     {new Date(test.createdAt).toLocaleDateString()}
                   </td>

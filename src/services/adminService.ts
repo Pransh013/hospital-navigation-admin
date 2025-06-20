@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { adminRepository } from "@/repositories/adminRepository";
-import Admin from "@/models/admin";
+import { Admin } from "@/models/admin";
 import { AdminSignupType } from "@/lib/validations";
 import { hashPassword } from "@/lib/authUtils";
 

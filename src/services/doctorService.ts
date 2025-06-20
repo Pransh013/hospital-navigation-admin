@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { doctorRepository } from "@/repositories/doctorRepository";
-import Doctor from "@/models/doctor";
+import { Doctor } from "@/models/doctor";
 import { DoctorFormType } from "@/lib/validations";
 
 export const doctorService = {

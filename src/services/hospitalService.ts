@@ -1,6 +1,6 @@
 import { hospitalRepository } from "@/repositories/hospitalRepository";
 import { ActionResponse } from "@/lib/validations";
-import Hospital from "@/models/hospital";
+import { Hospital } from "@/models/hospital";
 
 export const hospitalService = {
   getAll: async (): Promise<ActionResponse<Hospital[]>> => {

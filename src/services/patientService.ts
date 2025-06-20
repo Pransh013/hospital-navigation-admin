@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { patientRepository } from "@/repositories/patientRepository";
-import Patient from "@/models/patient";
+import { Patient } from "@/models/patient";
 import { hashPassword } from "@/lib/authUtils";
 import { PatientFormType } from "@/lib/validations";
 
@@ -33,7 +33,7 @@ export const patientService = {
     };
 
     await patientRepository.create(patient);
-    return patient.patientId
+    return patient.patientId;
   },
 
   getById: async (patientId: string): Promise<Patient | null> => {

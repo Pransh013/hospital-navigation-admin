@@ -1,8 +1,9 @@
-export default interface Hospital {
-  hospitalId: string;
-  hospitalName: string;
+export interface Hospital {
+  hospitalId: string; // Partition Key
+  hospitalName: string; // GSI
   address?: string;
-  contactInfo?: string;
+  phone?: string;
+  email?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -5,7 +5,7 @@ import {
   UpdateCommand,
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
-import Doctor from "@/models/doctor";
+import { Doctor } from "@/models/doctor";
 
 export const doctorRepository = {
   create: async (doctor: Doctor): Promise<void> => {

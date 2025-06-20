@@ -3,7 +3,7 @@
 import { doctorService } from "@/services/doctorService";
 import { getCurrentAdminAction } from "@/actions/admin";
 import { DoctorFormType, ActionResponse } from "@/lib/validations";
-import Doctor from "@/models/doctor";
+import { Doctor } from "@/models/doctor";
 
 export async function addDoctorAction(
   data: DoctorFormType

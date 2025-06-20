@@ -1,18 +1,21 @@
 export type PatientTestStatus =
-  | "pending"
-  | "in-progress"
-  | "completed"
+  | "assigned"
+  | "test_completed"
+  | "report_ready"
+  | "consultation_scheduled"
+  | "consultation_completed"
   | "cancelled";
 
-export default interface PatientTest {
-  patientTestId: string;
-  patientId: string;
+export interface PatientTest {
+  patientTestId: string; // Partition Key
+  patientId: string; // GSI
+  hospitalId: string; // GSI
   testId: string;
   status: PatientTestStatus;
   reportUrl?: string;
   reportUploadedAt?: string;
   doctorId?: string;
-  doctorAssignedAt?: string;
+  consultationSlotId?: string;
   createdAt: string;
   updatedAt: string;
 }

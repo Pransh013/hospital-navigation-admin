@@ -3,7 +3,7 @@
 import { patientService } from "@/services/patientService";
 import { getCurrentAdminAction } from "@/actions/admin";
 import { ActionResponse, PatientFormType } from "@/lib/validations";
-import Patient from "@/models/patient";
+import { Patient } from "@/models/patient";
 
 export async function createPatientAction(
   formData: PatientFormType

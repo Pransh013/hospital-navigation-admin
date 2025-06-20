@@ -1,6 +1,12 @@
 import dbClient, { patientTestsTable } from "@/lib/db/dynamodb";
-import { PutCommand, QueryCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
-import PatientTest from "@/models/patientTest";
+import {
+  PutCommand,
+  QueryCommand,
+  DeleteCommand,
+  UpdateCommand,
+  GetCommand,
+} from "@aws-sdk/lib-dynamodb";
+import { PatientTest } from "@/models/patientTest";
 
 // TODO: Optimize GSI structure
 // Consider updating the patientId-index GSI to use a composite key:
@@ -68,6 +74,80 @@ export const patientTestRepository = {
         TableName: patientTestsTable,
         Key: {
           patientTestId,
+        },
+      })
+    );
+  },
+
+  findByHospitalId: async (hospitalId: string): Promise<PatientTest[]> => {
+    const response = await dbClient.send(
+      new QueryCommand({
+        TableName: patientTestsTable,
+        IndexName: "hospitalId-index",
+        KeyConditionExpression: "hospitalId = :hospitalId",
+        ExpressionAttributeValues: {
+          ":hospitalId": hospitalId,
+        },
+      })
+    );
+    return (response.Items || []) as PatientTest[];
+  },
+
+  update: async (
+    patientTestId: string,
+    updateData: Partial<PatientTest>
+  ): Promise<void> => {
+    await dbClient.send(
+      new UpdateCommand({
+        TableName: patientTestsTable,
+        Key: { patientTestId },
+        UpdateExpression: `SET ${Object.keys(updateData)
+          .map((k) => `#${k} = :${k}`)
+          .join(", ")}`,
+        ExpressionAttributeNames: Object.keys(updateData).reduce(
+          (acc, k) => ({ ...acc, [`#${k}`]: k }),
+          {}
+        ),
+        ExpressionAttributeValues: Object.entries(updateData).reduce(
+          (acc, [k, v]) => ({ ...acc, [`:${k}`]: v }),
+          {}
+        ),
+      })
+    );
+  },
+
+  findById: async (patientTestId: string): Promise<PatientTest | null> => {
+    const { Item } = await dbClient.send(
+      new GetCommand({
+        TableName: patientTestsTable,
+        Key: { patientTestId },
+      })
+    );
+    return Item ? (Item as PatientTest) : null;
+  },
+  
+  updateConsultationDetails: async ({
+    patientTestId,
+    doctorId,
+    slotId,
+  }: {
+    patientTestId: string;
+    doctorId: string;
+    slotId: string;
+  }) => {
+    await dbClient.send(
+      new UpdateCommand({
+        TableName: "patientTests",
+        Key: { patientTestId },
+        UpdateExpression:
+          "SET doctorId = :doc, consultationSlotId = :slot, #status = :status",
+        ExpressionAttributeNames: {
+          "#status": "status",
+        },
+        ExpressionAttributeValues: {
+          ":doc": doctorId,
+          ":slot": slotId,
+          ":status": "consultation_scheduled",
         },
       })
     );

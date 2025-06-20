@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { generateToken, isValidPassword, verifyToken } from "@/lib/authUtils";
 import { adminService } from "./adminService";
 import { AdminSigninType } from "@/lib/validations";
-import Admin from "@/models/admin";
+import { Admin } from "@/models/admin";
 import { AUTH_COOKIE_NAME, TOKEN_EXPIRY_SECONDS } from "@/constants";
 
 export const authService = {

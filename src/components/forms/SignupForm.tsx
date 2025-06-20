@@ -31,7 +31,7 @@ import { adminSignupSchema, AdminSignupType } from "@/lib/validations";
 import { useRouter } from "next/navigation";
 import { adminSignupAction } from "@/actions/admin";
 import { toast } from "sonner";
-import Hospital from "@/models/hospital";
+import { Hospital } from "@/models/hospital";
 
 export default function SignupForm({ hospitals }: { hospitals: Hospital[] }) {
   const router = useRouter();

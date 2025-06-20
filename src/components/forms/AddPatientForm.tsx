@@ -31,7 +31,7 @@ import { useRouter } from "next/navigation";
 import { createPatientAction } from "@/actions/patient";
 import { assignPatientTestsAction } from "@/actions/patientTest";
 import { patientFormSchema, PatientFormType } from "@/lib/validations";
-import Test from "@/models/test";
+import { Test } from "@/models/test";
 
 export default function AddPatientForm({ tests }: { tests: Test[] }) {
   const router = useRouter();

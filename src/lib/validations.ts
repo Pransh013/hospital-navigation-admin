@@ -1,4 +1,4 @@
-import Admin from "@/models/admin";
+import { Admin } from "@/models/admin";
 import { z } from "zod";
 
 export const adminSignupSchema = z.object({
