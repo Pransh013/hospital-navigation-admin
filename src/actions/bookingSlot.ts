@@ -21,7 +21,7 @@ export async function getAvailableSlots(
   }
 }
 
-export async function createConsultationSlotAction({
+export async function bookSlotAction({
   hospitalId,
   doctorId,
   patientId,
@@ -37,19 +37,22 @@ export async function createConsultationSlotAction({
   date: string;
   startTime: string;
   endTime: string;
-}): Promise<ActionResponse<{ slot: BookingSlot }>> {
+}): Promise<ActionResponse<null>> {
   try {
-    const slot = await bookingSlotService.assignConsultationSlot({
+    const booked = await bookingSlotService.bookSlot(
       hospitalId,
       doctorId,
       patientId,
       patientTestId,
       date,
       startTime,
-      endTime,
-    });
-    return { success: true, data: { slot } };
+      endTime
+    );
+    if (!booked) {
+      return { success: false, error: "Slot already booked" };
+    }
+    return { success: true };
   } catch (err: any) {
-    return { success: false, error: err.message || "Failed to assign slot" };
+    return { success: false, error: err.message || "Failed to book slot" };
   }
 }

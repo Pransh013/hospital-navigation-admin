@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Patient } from "@/models/patient";
 import { PatientTest } from "@/models/patientTest";
 import { Test } from "@/models/test";
+import AssignDoctorDialog from "@/components/AssignDoctorDialog";
 
 export default function PatientRecordsTable() {
   const [isLoading, setIsLoading] = useState(true);
@@ -21,6 +22,15 @@ export default function PatientRecordsTable() {
       patientTest: PatientTest;
     }[]
   >([]);
+  const [assignDialog, setAssignDialog] = useState<{
+    open: boolean;
+    patientId: string | null;
+    patientTestId: string | null;
+  }>({
+    open: false,
+    patientId: null,
+    patientTestId: null,
+  });
 
   async function fetchAllRecords() {
     try {
@@ -88,7 +98,7 @@ export default function PatientRecordsTable() {
   }
 
   function handleAssignDoctor(patientId: string, patientTestId: string) {
-    console.log("Doctor assigner for:", patientId, patientTestId);
+    setAssignDialog({ open: true, patientId, patientTestId });
   }
 
   return (
@@ -149,11 +159,12 @@ export default function PatientRecordsTable() {
                   </td>
                   <td className="p-2">
                     {record.patientTest.doctorId ? (
-                      <div className="flex items-center gap-1 w-28 py-1.5 bg-[#3CBEC1] text-white rounded-md shadow-xs">
+                      <div className="flex items-center gap-1 w-28 py-1.5 bg-[#3CBEC1] text-white rounded-md shadow-xs justify-center">
                         <CircleCheck size={16} />
                         <p>Assigned</p>
                       </div>
-                    ) : record.patientTest.status === "report_ready" ? (
+                    ) : record.patientTest.status === "test_completed" ||
+                      record.patientTest.status === "report_ready" ? (
                       <Button
                         size="sm"
                         variant="outline"
@@ -178,6 +189,15 @@ export default function PatientRecordsTable() {
           </table>
         )}
       </Card>
+      <AssignDoctorDialog
+        open={assignDialog.open}
+        onOpenChange={(open) =>
+          setAssignDialog({ open, patientId: null, patientTestId: null })
+        }
+        patientId={assignDialog.patientId || ""}
+        patientTestId={assignDialog.patientTestId || ""}
+        onAssignmentSuccess={fetchAllRecords}
+      />
     </>
   );
 }

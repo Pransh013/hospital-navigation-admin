@@ -53,7 +53,7 @@ export default function AddDoctorPage() {
       } else {
         toast.error(response.error || "Failed to add doctor");
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to add doctor");
     }
   }

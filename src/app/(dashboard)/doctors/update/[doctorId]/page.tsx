@@ -49,7 +49,11 @@ export default function UpdateDoctorPage() {
   useEffect(() => {
     async function fetchDoctor() {
       try {
-        const { success, data: doctor, error } = await getDoctorAction(doctorId);
+        const {
+          success,
+          data: doctor,
+          error,
+        } = await getDoctorAction(doctorId);
         if (success && doctor) {
           form.reset({
             name: doctor.name,
@@ -60,7 +64,7 @@ export default function UpdateDoctorPage() {
           toast.error(error || "Doctor not found");
           router.push("/doctors");
         }
-      } catch (error) {
+      } catch {
         toast.error("Failed to fetch doctor");
         router.push("/doctors");
       } finally {
@@ -80,7 +84,7 @@ export default function UpdateDoctorPage() {
       } else {
         toast.error(error || "Failed to update doctor");
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to update doctor");
     }
   }

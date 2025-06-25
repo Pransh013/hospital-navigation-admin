@@ -47,7 +47,7 @@ export default function AddTestPage() {
       } else {
         toast.error(error || "Failed to add test");
       }
-    } catch (err) {
+    } catch {
       toast.error("Something went wrong");
     }
   }

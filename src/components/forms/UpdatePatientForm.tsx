@@ -94,7 +94,7 @@ export default function UpdatePatientForm({ tests }: { tests: Test[] }) {
         } else {
           toast.error(assignedTestsError || "Failed to load assigned tests");
         }
-      } catch (error) {
+      } catch {
         toast.error("Failed to fetch data");
         router.push("/patients");
       } finally {
@@ -147,7 +147,7 @@ export default function UpdatePatientForm({ tests }: { tests: Test[] }) {
 
       toast.success("Patient updated successfully");
       router.push("/patients");
-    } catch (err) {
+    } catch {
       toast.error("Failed to update patient");
     }
   }
@@ -280,7 +280,7 @@ export default function UpdatePatientForm({ tests }: { tests: Test[] }) {
                 <FormField
                   control={form.control}
                   name="tests"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Assign Tests</FormLabel>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">

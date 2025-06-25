@@ -13,13 +13,6 @@ export interface BookingSlot {
   updatedAt: string;
 }
 
-export interface TimeSlot {
-  startTime: string;
-  endTime: string;
-  isAvailable: boolean;
-  slotId?: string;
-}
-
 export const SLOT_DURATION = 15;
 export const WORKING_HOURS = {
   start: "10:00",

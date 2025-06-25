@@ -125,7 +125,7 @@ export const patientTestRepository = {
     );
     return Item ? (Item as PatientTest) : null;
   },
-  
+
   updateConsultationDetails: async ({
     patientTestId,
     doctorId,
@@ -137,7 +137,7 @@ export const patientTestRepository = {
   }) => {
     await dbClient.send(
       new UpdateCommand({
-        TableName: "patientTests",
+        TableName: patientTestsTable,
         Key: { patientTestId },
         UpdateExpression:
           "SET doctorId = :doc, consultationSlotId = :slot, #status = :status",

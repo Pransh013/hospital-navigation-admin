@@ -1,9 +1,9 @@
 import dbClient, { bookingSlotsTable } from "@/lib/db/dynamodb";
-import { PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { QueryCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { BookingSlot } from "@/models/bookingSlot";
 
 export const bookingSlotRepository = {
-  findAvailableDoctorSlots: async (
+  findBookedDoctorSlots: async (
     hospitalId: string,
     doctorId: string,
     date: string
@@ -11,13 +11,14 @@ export const bookingSlotRepository = {
     const response = await dbClient.send(
       new QueryCommand({
         TableName: bookingSlotsTable,
-        IndexName: "doctorId-date-index", // Required GSI (doctorId + date)
-        KeyConditionExpression: "doctorId = :doc AND date = :d",
-        FilterExpression: "status = :status AND hospitalId = :hid",
+        IndexName: "doctorId-date-index",
+        KeyConditionExpression: "doctorId = :doc AND #date = :d",
+        FilterExpression: "#status = :status AND hospitalId = :hid",
+        ExpressionAttributeNames: { "#date": "date", "#status": "status" },
         ExpressionAttributeValues: {
           ":doc": doctorId,
           ":d": date,
-          ":status": "available",
+          ":status": "booked",
           ":hid": hospitalId,
         },
       })
@@ -25,24 +26,21 @@ export const bookingSlotRepository = {
     return (response.Items || []) as BookingSlot[];
   },
 
-  createSlot: async (slot: BookingSlot): Promise<void> => {
-    await dbClient.send(
-      new PutCommand({
-        TableName: bookingSlotsTable,
-        Item: slot,
-      })
-    );
-  },
-
-  markSlotBooked: async (slotId: string): Promise<void> => {
-    await dbClient.send(
-      new UpdateCommand({
-        TableName: bookingSlotsTable,
-        Key: { slotId },
-        UpdateExpression: "SET #status = :booked",
-        ExpressionAttributeNames: { "#status": "status" },
-        ExpressionAttributeValues: { ":booked": "booked" },
-      })
-    );
+  bookSlot: async (slot: BookingSlot): Promise<boolean> => {
+    try {
+      await dbClient.send(
+        new PutCommand({
+          TableName: bookingSlotsTable,
+          Item: slot,
+          ConditionExpression: "attribute_not_exists(slotId)",
+        })
+      );
+      return true;
+    } catch (error: any) {
+      if (error.name === "ConditionalCheckFailedException") {
+        return false;
+      }
+      throw error;
+    }
   },
 };

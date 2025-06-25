@@ -42,7 +42,7 @@ export default function DiagnosticTestList() {
         }
 
         setTests(testsData);
-      } catch (error) {
+      } catch {
         toast.error("Failed to load diagnostic tests");
       } finally {
         setIsLoading(false);

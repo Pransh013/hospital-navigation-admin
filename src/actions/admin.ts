@@ -7,7 +7,7 @@ import {
   AdminSigninType,
   AdminSignupType,
 } from "@/lib/validations";
-import Admin from "@/models/admin";
+import { Admin } from "@/models/admin";
 
 export async function adminSignupAction(
   formData: AdminSignupType
@@ -55,7 +55,7 @@ export async function getCurrentAdminAction(): Promise<
         hospitalId: user.hospitalId,
       },
     };
-  } catch (err: any) {
+  } catch {
     return { success: false, error: "User not authenticated." };
   }
 }
