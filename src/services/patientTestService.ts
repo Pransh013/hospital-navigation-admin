@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { patientTestRepository } from "@/repositories/patientTestRepository";
 import { testRepository } from "@/repositories/testRepository";
 import { getCurrentAdminAction } from "@/actions/admin";
-import { PatientTest } from "@/models/patientTest";
+import { PatientTest, PatientTestStatus } from "@/models/patientTest";
 
 export const patientTestService = {
   assignTests: async (testIds: string[], patientId: string): Promise<void> => {
@@ -53,7 +53,6 @@ export const patientTestService = {
     patientTestId: string,
     consultationSlotId: string
   ): Promise<void> => {
-    // Fetch the patient test
     const patientTest = await patientTestRepository.findById(patientTestId);
     if (!patientTest) throw new Error("Patient test not found");
     if (patientTest.consultationSlotId)
@@ -61,6 +60,16 @@ export const patientTestService = {
     await patientTestRepository.update(patientTestId, {
       consultationSlotId,
       status: "consultation_scheduled",
+      updatedAt: new Date().toISOString(),
+    });
+  },
+
+  updateStatus: async (
+    patientTestId: string,
+    status: PatientTestStatus
+  ): Promise<void> => {
+    await patientTestRepository.update(patientTestId, {
+      status,
       updatedAt: new Date().toISOString(),
     });
   },

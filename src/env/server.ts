@@ -13,6 +13,7 @@ export const env = createEnv({
     DYNAMODB_TABLE_DOCTORS: z.string().min(1),
     DYNAMODB_TABLE_PATIENT_TESTS: z.string().min(1),
     DYNAMODB_TABLE_BOOKING_SLOTS: z.string().min(1),
+    DYNAMODB_TABLE_PACKAGES: z.string().min(1),
     JWT_SECRET: z.string().min(1),
   },
   experimental__runtimeEnv: process.env,

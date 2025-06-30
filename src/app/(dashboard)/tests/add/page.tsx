@@ -32,6 +32,7 @@ export default function AddTestPage() {
       name: "",
       price: "",
       description: "",
+      duration: "",
       floorNumber: "",
       roomNumber: "",
     },
@@ -100,6 +101,20 @@ export default function AddTestPage() {
                     <FormLabel>Price</FormLabel>
                     <FormControl>
                       <Input placeholder="₹00.00" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="duration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Duration (in minutes)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="30" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

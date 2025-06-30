@@ -36,9 +36,9 @@ export const patientFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Please enter a valid email address"),
-  tests: z.array(z.string(), {
-    required_error: "Please select at least one test",
-  }),
+  tests: z.array(z.string()).optional(),
+  packageId: z.string().optional(),
+  assignmentType: z.enum(["tests", "packages"]),
   gender: z.enum(["male", "female", "other"], {
     required_error: "Please select a gender",
   }),
@@ -57,11 +57,27 @@ export const testFormSchema = z.object({
     .string()
     .min(1, "Price is required")
     .regex(/^\d*\.?\d*$/, "Must be a valid price format"),
+  duration: z
+    .string()
+    .min(1, "Duration is required")
+    .regex(/^\d+$/, "Must be a number"),
   roomNumber: z.string().optional(),
   floorNumber: z.string().optional(),
 });
 
 export type TestFormType = z.infer<typeof testFormSchema>;
+
+export const packageFormSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  description: z.string().optional(),
+  testIds: z.array(z.string()).min(1, "Please select at least one test"),
+  price: z
+    .string()
+    .min(1, "Price is required")
+    .regex(/^\d*\.?\d*$/, "Must be a valid price format"),
+});
+
+export type PackageFormType = z.infer<typeof packageFormSchema>;
 
 export type ActionResponse<T> = {
   success: boolean;

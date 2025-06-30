@@ -32,8 +32,16 @@ import { createPatientAction } from "@/actions/patient";
 import { assignPatientTestsAction } from "@/actions/patientTest";
 import { patientFormSchema, PatientFormType } from "@/lib/validations";
 import { Test } from "@/models/test";
+import { Package } from "@/models/package";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export default function AddPatientForm({ tests }: { tests: Test[] }) {
+export default function AddPatientForm({
+  tests,
+  packages,
+}: {
+  tests: Test[];
+  packages: Package[];
+}) {
   const router = useRouter();
   const form = useForm<PatientFormType>({
     resolver: zodResolver(patientFormSchema),
@@ -42,6 +50,8 @@ export default function AddPatientForm({ tests }: { tests: Test[] }) {
       lastName: "",
       email: "",
       tests: [],
+      packageId: "",
+      assignmentType: "tests",
       gender: "male",
       contactNumber: "",
       address: "",
@@ -56,11 +66,25 @@ export default function AddPatientForm({ tests }: { tests: Test[] }) {
         error,
       } = await createPatientAction(values);
       if (success && patientId) {
-        if (values.tests && values.tests.length > 0) {
+        if (
+          values.assignmentType === "tests" &&
+          values.tests &&
+          values.tests.length > 0
+        ) {
           await assignPatientTestsAction({
             patientId,
             testIds: values.tests,
           });
+        } else if (values.assignmentType === "packages" && values.packageId) {
+          const selectedPackage = packages.find(
+            (p) => p.packageId === values.packageId
+          );
+          if (selectedPackage) {
+            await assignPatientTestsAction({
+              patientId,
+              testIds: selectedPackage.testIds,
+            });
+          }
         }
         toast.success("Patient added successfully");
         form.reset();
@@ -85,7 +109,7 @@ export default function AddPatientForm({ tests }: { tests: Test[] }) {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="flex gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="firstName"
@@ -158,49 +182,105 @@ export default function AddPatientForm({ tests }: { tests: Test[] }) {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="tests"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Assign Tests</FormLabel>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                      {tests.map((test) => (
-                        <div
-                          key={test.testId}
-                          className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-accent cursor-pointer"
-                        >
-                          <Input
-                            type="checkbox"
-                            className="h-4 w-4"
-                            value={test.testId}
-                            checked={field.value?.includes(test.testId)}
-                            onChange={(e) => {
-                              const newValue = e.target.value;
-                              if (e.target.checked) {
-                                field.onChange([
-                                  ...(field.value || []),
-                                  newValue,
-                                ]);
-                              } else {
-                                field.onChange(
-                                  (field.value || []).filter(
-                                    (id) => id !== newValue
-                                  )
-                                );
-                              }
-                            }}
-                          />
-                          <span className="text-sm font-medium">
-                            {test.name}
-                          </span>
+              <Tabs
+                defaultValue="tests"
+                onValueChange={(value) =>
+                  form.setValue("assignmentType", value as "tests" | "packages")
+                }
+                className="w-full"
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger
+                    value="tests"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
+                    Assign Tests
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="packages"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
+                    Assign Package
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="tests">
+                  <FormField
+                    control={form.control}
+                    name="tests"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Select Tests</FormLabel>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                          {tests.map((test) => (
+                            <div
+                              key={test.testId}
+                              className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-accent cursor-pointer"
+                            >
+                              <Input
+                                type="checkbox"
+                                className="h-4 w-4 accent-primary"
+                                value={test.testId}
+                                checked={field.value?.includes(test.testId)}
+                                onChange={(e) => {
+                                  const newValue = e.target.value;
+                                  if (e.target.checked) {
+                                    field.onChange([
+                                      ...(field.value || []),
+                                      newValue,
+                                    ]);
+                                  } else {
+                                    field.onChange(
+                                      (field.value || []).filter(
+                                        (id) => id !== newValue
+                                      )
+                                    );
+                                  }
+                                }}
+                              />
+                              <span className="text-sm font-medium">
+                                {test.name}
+                              </span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+                <TabsContent value="packages">
+                  <FormField
+                    control={form.control}
+                    name="packageId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Select a Package</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a package" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {packages.map((pkg) => (
+                              <SelectItem
+                                key={pkg.packageId}
+                                value={pkg.packageId}
+                              >
+                                {pkg.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+              </Tabs>
 
               <FormField
                 control={form.control}

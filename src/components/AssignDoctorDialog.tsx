@@ -32,7 +32,6 @@ interface AssignDoctorDialogProps {
   patientId: string;
   patientTestId: string;
   onAssignmentSuccess: () => void;
-  // Optionally, pass patientTestId if needed for further logic
 }
 
 export default function AssignDoctorDialog({
@@ -49,7 +48,6 @@ export default function AssignDoctorDialog({
   const [selectedSlot, setSelectedSlot] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
-  // Fetch doctors on open
   useEffect(() => {
     if (!open) return;
     (async () => {
@@ -59,7 +57,6 @@ export default function AssignDoctorDialog({
     })();
   }, [open]);
 
-  // Fetch slots when doctor and date are selected
   useEffect(() => {
     if (!selectedDoctor || !selectedDate) return;
     (async () => {

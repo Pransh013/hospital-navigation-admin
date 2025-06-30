@@ -77,7 +77,7 @@ export default function AddDoctorPage() {
                   <FormItem>
                     <FormLabel>Doctor Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Dr. John Doe" {...field} />
+                      <Input placeholder="John Doe" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

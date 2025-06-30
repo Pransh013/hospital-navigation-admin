@@ -12,6 +12,7 @@ import { Patient } from "@/models/patient";
 import { PatientTest } from "@/models/patientTest";
 import { Test } from "@/models/test";
 import AssignDoctorDialog from "@/components/AssignDoctorDialog";
+import { UploadReportDialog } from "./UploadReportDialog";
 
 export default function PatientRecordsTable() {
   const [isLoading, setIsLoading] = useState(true);
@@ -29,6 +30,13 @@ export default function PatientRecordsTable() {
   }>({
     open: false,
     patientId: null,
+    patientTestId: null,
+  });
+  const [uploadDialog, setUploadDialog] = useState<{
+    open: boolean;
+    patientTestId: string | null;
+  }>({
+    open: false,
     patientTestId: null,
   });
 
@@ -93,8 +101,8 @@ export default function PatientRecordsTable() {
     fetchAllRecords();
   }, []);
 
-  function handleUpload(patientId: string, testId: string) {
-    console.log("Upload report for:", patientId, testId);
+  function handleUpload(patientTestId: string) {
+    setUploadDialog({ open: true, patientTestId });
   }
 
   function handleAssignDoctor(patientId: string, patientTestId: string) {
@@ -141,20 +149,19 @@ export default function PatientRecordsTable() {
                         <CircleCheck size={16} />
                         <p>Uploaded</p>
                       </div>
-                    ) : (
+                    ) : record.patientTest.status === "test_completed" ? (
                       <Button
                         size="sm"
                         variant="outline"
                         className="border-secondary bg-white w-28"
                         onClick={() =>
-                          handleUpload(
-                            record.patient.patientId,
-                            record.test.testId
-                          )
+                          handleUpload(record.patientTest.patientTestId)
                         }
                       >
                         <Upload /> Upload
                       </Button>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
                     )}
                   </td>
                   <td className="p-2">
@@ -197,6 +204,12 @@ export default function PatientRecordsTable() {
         patientId={assignDialog.patientId || ""}
         patientTestId={assignDialog.patientTestId || ""}
         onAssignmentSuccess={fetchAllRecords}
+      />
+      <UploadReportDialog
+        isOpen={uploadDialog.open}
+        onClose={() => setUploadDialog({ open: false, patientTestId: null })}
+        patientTestId={uploadDialog.patientTestId || ""}
+        onStatusChange={fetchAllRecords}
       />
     </>
   );

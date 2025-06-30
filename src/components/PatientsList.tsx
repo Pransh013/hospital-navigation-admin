@@ -74,9 +74,6 @@ export default function PatientsList({
                   <h3 className="font-semibold text-lg">
                     {patient.firstName} {patient.lastName}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    ID: {patient.patientId}
-                  </p>
                 </div>
                 <div className="bg-primary/10 text-primary px-2 py-1 rounded-md text-sm font-medium">
                   {patient.gender}
@@ -93,12 +90,6 @@ export default function PatientsList({
                     className="text-primary hover:underline"
                   >
                     Edit
-                  </Link>
-                  <Link
-                    href={`/patients/${patient.patientId}`}
-                    className="text-primary hover:underline"
-                  >
-                    View Details
                   </Link>
                 </div>
               </div>

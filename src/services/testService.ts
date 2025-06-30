@@ -22,6 +22,7 @@ export const testService = {
       name: data.name,
       description: data.description,
       price: parseFloat(data.price),
+      duration: parseInt(data.duration, 10),
       roomNumber: data.roomNumber,
       floorNumber: data.floorNumber,
       status: "active",

@@ -2,7 +2,7 @@
 
 import { patientTestService } from "@/services/patientTestService";
 import { ActionResponse } from "@/lib/validations";
-import { PatientTest } from "@/models/patientTest";
+import { PatientTest, PatientTestStatus } from "@/models/patientTest";
 import { getCurrentAdminAction } from "@/actions/admin";
 
 type AssignTestsInput = {
@@ -82,6 +82,21 @@ export async function scheduleConsultationAction(
     return {
       success: false,
       error: err.message || "Failed to schedule consultation.",
+    };
+  }
+}
+
+export async function updatePatientTestStatusAction(
+  patientTestId: string,
+  status: PatientTestStatus
+): Promise<ActionResponse<null>> {
+  try {
+    await patientTestService.updateStatus(patientTestId, status);
+    return { success: true };
+  } catch (err: any) {
+    return {
+      success: false,
+      error: err.message || "Failed to update test status.",
     };
   }
 }

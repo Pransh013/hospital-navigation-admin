@@ -1,4 +1,10 @@
-import { HeartPulse, LayoutDashboard, Stethoscope, Users } from "lucide-react";
+import {
+  HeartPulse,
+  LayoutDashboard,
+  Package,
+  Stethoscope,
+  Users,
+} from "lucide-react";
 
 export const sidebarData = {
   navMain: [
@@ -37,6 +43,17 @@ export const sidebarData = {
         {
           title: "Add Tests",
           url: "/tests/add",
+        },
+      ],
+    },
+    {
+      title: "Manage Packages",
+      url: "/packages",
+      icon: Package,
+      items: [
+        {
+          title: "Add Package",
+          url: "/packages/add",
         },
       ],
     },
