@@ -46,6 +46,8 @@ export const patientFormSchema = z.object({
     .string()
     .min(10, "Contact number must be at least 10 digits"),
   address: z.string().min(1, "Address is required"),
+  bookingDate: z.date({ required_error: "Booking date is required" }),
+  consultationRequired: z.boolean().optional(),
 });
 
 export type PatientFormType = z.infer<typeof patientFormSchema>;

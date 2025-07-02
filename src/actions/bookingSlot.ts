@@ -25,7 +25,6 @@ export async function bookSlotAction({
   hospitalId,
   doctorId,
   patientId,
-  patientTestId,
   date,
   startTime,
   endTime,
@@ -33,7 +32,6 @@ export async function bookSlotAction({
   hospitalId: string;
   doctorId: string;
   patientId: string;
-  patientTestId: string;
   date: string;
   startTime: string;
   endTime: string;
@@ -43,7 +41,6 @@ export async function bookSlotAction({
       hospitalId,
       doctorId,
       patientId,
-      patientTestId,
       date,
       startTime,
       endTime

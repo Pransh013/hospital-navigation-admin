@@ -39,6 +39,7 @@ export default function AddTestPage() {
   });
 
   async function onSubmit(values: TestFormType) {
+    console.log("Values", values);
     try {
       const { success, error } = await createTestAction(values);
       if (success) {

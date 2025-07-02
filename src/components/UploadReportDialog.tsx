@@ -9,38 +9,39 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { updatePatientTestStatusAction } from "@/actions/patientTest";
+import { updatePatientReportUrlAction } from "@/actions/patient";
 import { toast } from "sonner";
 
 interface UploadReportDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  patientTestId: string;
-  onStatusChange: () => void;
+  patientId: string;
+  onReportUploaded: () => void;
 }
 
 export function UploadReportDialog({
   isOpen,
   onClose,
-  patientTestId,
-  onStatusChange,
+  patientId,
+  onReportUploaded,
 }: UploadReportDialogProps) {
-  const handleUpdateStatus = async () => {
+  const handleUploadReport = async () => {
     try {
-      const { success, error } = await updatePatientTestStatusAction(
-        patientTestId,
-        "report_ready"
+      // Simulate uploading and getting a report URL
+      const reportUrl = `https://dummy-report-url.com/report/${patientId}.pdf`;
+      const { success, error } = await updatePatientReportUrlAction(
+        patientId,
+        reportUrl
       );
-
       if (success) {
-        toast.success("Status updated to Report Ready");
-        onStatusChange();
+        toast.success("Report uploaded and patient updated");
+        onReportUploaded();
         onClose();
       } else {
-        toast.error(error || "Failed to update status");
+        toast.error(error || "Failed to update report");
       }
     } catch {
-      toast.error("Failed to update status");
+      toast.error("Failed to update report");
     }
   };
 
@@ -51,8 +52,8 @@ export function UploadReportDialog({
           <DialogTitle>Upload Report</DialogTitle>
           <DialogDescription>
             This is a placeholder for the report upload functionality. For now,
-            clicking the button below will mark the test status as &ldquo;Report
-            Ready&rdquo;.
+            clicking the button below will upload a dummy report and update the
+            patient.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
@@ -64,7 +65,7 @@ export function UploadReportDialog({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleUpdateStatus}>Mark as Report Ready</Button>
+          <Button onClick={handleUploadReport}>Upload Report</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

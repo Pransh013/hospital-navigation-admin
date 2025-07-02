@@ -22,6 +22,10 @@ export const sidebarData = {
           title: "Add Patient",
           url: "/patients/add",
         },
+        {
+          title: "Patient Actions",
+          url: "/patients/actions",
+        },
       ],
     },
     {

@@ -125,31 +125,4 @@ export const patientTestRepository = {
     );
     return Item ? (Item as PatientTest) : null;
   },
-
-  updateConsultationDetails: async ({
-    patientTestId,
-    doctorId,
-    slotId,
-  }: {
-    patientTestId: string;
-    doctorId: string;
-    slotId: string;
-  }) => {
-    await dbClient.send(
-      new UpdateCommand({
-        TableName: patientTestsTable,
-        Key: { patientTestId },
-        UpdateExpression:
-          "SET doctorId = :doc, consultationSlotId = :slot, #status = :status",
-        ExpressionAttributeNames: {
-          "#status": "status",
-        },
-        ExpressionAttributeValues: {
-          ":doc": doctorId,
-          ":slot": slotId,
-          ":status": "consultation_scheduled",
-        },
-      })
-    );
-  },
 };

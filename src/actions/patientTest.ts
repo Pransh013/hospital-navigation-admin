@@ -2,7 +2,7 @@
 
 import { patientTestService } from "@/services/patientTestService";
 import { ActionResponse } from "@/lib/validations";
-import { PatientTest, PatientTestStatus } from "@/models/patientTest";
+import { PatientTest } from "@/models/patientTest";
 import { getCurrentAdminAction } from "@/actions/admin";
 
 type AssignTestsInput = {
@@ -64,39 +64,6 @@ export async function getPatientTestsByHospitalAction(): Promise<
     return {
       success: false,
       error: err.message || "Failed to fetch patient tests by hospital.",
-    };
-  }
-}
-
-export async function scheduleConsultationAction(
-  patientTestId: string,
-  consultationSlotId: string
-): Promise<ActionResponse<null>> {
-  try {
-    await patientTestService.scheduleConsultation(
-      patientTestId,
-      consultationSlotId
-    );
-    return { success: true };
-  } catch (err: any) {
-    return {
-      success: false,
-      error: err.message || "Failed to schedule consultation.",
-    };
-  }
-}
-
-export async function updatePatientTestStatusAction(
-  patientTestId: string,
-  status: PatientTestStatus
-): Promise<ActionResponse<null>> {
-  try {
-    await patientTestService.updateStatus(patientTestId, status);
-    return { success: true };
-  } catch (err: any) {
-    return {
-      success: false,
-      error: err.message || "Failed to update test status.",
     };
   }
 }

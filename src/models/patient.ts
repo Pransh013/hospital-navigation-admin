@@ -8,6 +8,12 @@ export interface Patient {
   contactNumber: string;
   address: string;
   hospitalId: string; // GSI
+  bookingDate: string;
+  reportUrl?: string;
+  reportUploadedAt?: string;
+  consultationRequired?: boolean;
+  consultationSlotId?: string;
+  doctorId?: string;
   createdAt: string;
   updatedAt: string;
 }

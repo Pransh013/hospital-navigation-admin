@@ -28,6 +28,10 @@ export const patientService = {
       gender: data.gender,
       contactNumber: data.contactNumber,
       address: data.address,
+      bookingDate: data.bookingDate
+        ? data.bookingDate.toISOString().slice(0, 10)
+        : "",
+      consultationRequired: data.consultationRequired,
       createdAt: now,
       updatedAt: now,
     };
@@ -53,6 +57,22 @@ export const patientService = {
       gender: data.gender,
       contactNumber: data.contactNumber,
       address: data.address,
+      bookingDate: data.bookingDate
+        ? data.bookingDate.toISOString().slice(0, 10)
+        : "",
+      consultationRequired: data.consultationRequired,
+      updatedAt: now,
+    });
+  },
+
+  updateReportUrl: async (
+    patientId: string,
+    reportUrl: string
+  ): Promise<void> => {
+    const now = new Date().toISOString();
+    await patientRepository.update(patientId, {
+      reportUrl,
+      reportUploadedAt: now,
       updatedAt: now,
     });
   },

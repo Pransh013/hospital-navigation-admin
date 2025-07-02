@@ -59,21 +59,24 @@ export const patientRepository = {
     patientId: string,
     updateData: Partial<Patient>
   ): Promise<void> => {
+    // Dynamically build UpdateExpression and ExpressionAttributeValues
+    const fields = Object.keys(updateData);
+    if (fields.length === 0) return;
+    const UpdateExpression =
+      "SET " + fields.map((f) => `#${f} = :${f}`).join(", ");
+    const ExpressionAttributeNames = Object.fromEntries(
+      fields.map((f) => ["#" + f, f])
+    );
+    const ExpressionAttributeValues = Object.fromEntries(
+      fields.map((f) => [":" + f, (updateData as any)[f]])
+    );
     await dbClient.send(
       new UpdateCommand({
         TableName: patientsTable,
         Key: { patientId },
-        UpdateExpression:
-          "SET firstName = :f, lastName = :l, email = :e, gender = :g, contactNumber = :c, address = :a, updatedAt = :u",
-        ExpressionAttributeValues: {
-          ":f": updateData.firstName,
-          ":l": updateData.lastName,
-          ":e": updateData.email,
-          ":g": updateData.gender,
-          ":c": updateData.contactNumber,
-          ":a": updateData.address,
-          ":u": updateData.updatedAt,
-        },
+        UpdateExpression,
+        ExpressionAttributeNames,
+        ExpressionAttributeValues,
       })
     );
   },

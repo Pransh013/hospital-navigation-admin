@@ -63,3 +63,18 @@ export async function updatePatientAction(
     return { success: false, error: err.message || "Failed to update patient" };
   }
 }
+
+export async function updatePatientReportUrlAction(
+  patientId: string,
+  reportUrl: string
+): Promise<ActionResponse<void>> {
+  try {
+    await patientService.updateReportUrl(patientId, reportUrl);
+    return { success: true };
+  } catch (err: any) {
+    return {
+      success: false,
+      error: err.message || "Failed to update report URL",
+    };
+  }
+}

@@ -4,7 +4,7 @@ import {
   SLOT_DURATION,
   WORKING_HOURS,
 } from "@/models/bookingSlot";
-import { patientTestRepository } from "@/repositories/patientTestRepository";
+import { patientRepository } from "@/repositories/patientRepository";
 
 function generateAllPossibleSlots(
   date: string,
@@ -41,6 +41,7 @@ export const bookingSlotService = {
     doctorId: string,
     date: string
   ): Promise<BookingSlot[]> => {
+    if (!doctorId || !date) return [];
     const allSlots = generateAllPossibleSlots(date, hospitalId, doctorId);
     const bookedSlots = await bookingSlotRepository.findBookedDoctorSlots(
       hospitalId,
@@ -59,7 +60,6 @@ export const bookingSlotService = {
     hospitalId: string,
     doctorId: string,
     patientId: string,
-    patientTestId: string,
     date: string,
     startTime: string,
     endTime: string
@@ -80,10 +80,10 @@ export const bookingSlotService = {
     const booked = await bookingSlotRepository.bookSlot(slot);
 
     if (booked) {
-      await patientTestRepository.updateConsultationDetails({
-        patientTestId,
-        doctorId,
-        slotId: slot.slotId,
+      await patientRepository.update(patientId, {
+        consultationSlotId: slot.slotId,
+        doctorId: doctorId,
+        updatedAt: now,
       });
     }
 

@@ -30,7 +30,6 @@ interface AssignDoctorDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   patientId: string;
-  patientTestId: string;
   onAssignmentSuccess: () => void;
 }
 
@@ -38,7 +37,6 @@ export default function AssignDoctorDialog({
   open,
   onOpenChange,
   patientId,
-  patientTestId,
   onAssignmentSuccess,
 }: AssignDoctorDialogProps) {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -59,11 +57,13 @@ export default function AssignDoctorDialog({
 
   useEffect(() => {
     if (!selectedDoctor || !selectedDate) return;
+    const doctor = doctors.find((d) => d.doctorId === selectedDoctor);
+    if (!doctor) return;
     (async () => {
       setLoading(true);
       const dateStr = selectedDate.toISOString().slice(0, 10);
       const { success, data, error } = await getAvailableSlots(
-        doctors.find((d) => d.doctorId === selectedDoctor)?.hospitalId || "",
+        doctor.hospitalId,
         selectedDoctor,
         dateStr
       );
@@ -85,7 +85,6 @@ export default function AssignDoctorDialog({
       hospitalId: slot.hospitalId,
       doctorId: slot.doctorId!,
       patientId,
-      patientTestId,
       date: slot.date,
       startTime: slot.startTime,
       endTime: slot.endTime,

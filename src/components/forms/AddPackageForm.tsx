@@ -113,7 +113,7 @@ export function AddPackageForm({ tests }: { tests: Test[] }) {
                     >
                       <Input
                         type="checkbox"
-                        className="h-4 w-4"
+                        className="h-4 w-4 accent-primary"
                         value={test.testId}
                         checked={field.value?.includes(test.testId)}
                         onChange={(e) => {

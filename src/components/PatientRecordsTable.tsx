@@ -1,8 +1,6 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { CircleCheck, ClipboardPlus, Upload } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getPatientsAction } from "@/actions/patient";
 import { getPatientTestsByHospitalAction } from "@/actions/patientTest";
@@ -11,8 +9,6 @@ import { toast } from "sonner";
 import { Patient } from "@/models/patient";
 import { PatientTest } from "@/models/patientTest";
 import { Test } from "@/models/test";
-import AssignDoctorDialog from "@/components/AssignDoctorDialog";
-import { UploadReportDialog } from "./UploadReportDialog";
 
 export default function PatientRecordsTable() {
   const [isLoading, setIsLoading] = useState(true);
@@ -23,22 +19,6 @@ export default function PatientRecordsTable() {
       patientTest: PatientTest;
     }[]
   >([]);
-  const [assignDialog, setAssignDialog] = useState<{
-    open: boolean;
-    patientId: string | null;
-    patientTestId: string | null;
-  }>({
-    open: false,
-    patientId: null,
-    patientTestId: null,
-  });
-  const [uploadDialog, setUploadDialog] = useState<{
-    open: boolean;
-    patientTestId: string | null;
-  }>({
-    open: false,
-    patientTestId: null,
-  });
 
   async function fetchAllRecords() {
     try {
@@ -101,14 +81,6 @@ export default function PatientRecordsTable() {
     fetchAllRecords();
   }, []);
 
-  function handleUpload(patientTestId: string) {
-    setUploadDialog({ open: true, patientTestId });
-  }
-
-  function handleAssignDoctor(patientId: string, patientTestId: string) {
-    setAssignDialog({ open: true, patientId, patientTestId });
-  }
-
   return (
     <>
       <Card className="p-6">
@@ -122,9 +94,8 @@ export default function PatientRecordsTable() {
                 <th className="p-2">Name</th>
                 <th className="p-2">Test</th>
                 <th className="p-2">Status</th>
-                <th className="p-2">Date</th>
-                <th className="p-2">Report</th>
-                <th className="p-2">Doctor</th>
+                <th className="p-2">Booking Date</th>
+                <th className="p-2">Created At</th>
               </tr>
             </thead>
             <tbody>
@@ -139,56 +110,16 @@ export default function PatientRecordsTable() {
                   <td className="p-2">{record.test.name}</td>
                   <td className="p-2">{record.patientTest.status}</td>
                   <td className="p-2">
+                    {record.patient.bookingDate
+                      ? new Date(
+                          record.patient.bookingDate + "T00:00:00"
+                        ).toLocaleDateString()
+                      : ""}
+                  </td>
+                  <td className="p-2">
                     {new Date(
                       record.patientTest.createdAt
                     ).toLocaleDateString()}
-                  </td>
-                  <td className="p-2">
-                    {record.patientTest.reportUrl ? (
-                      <div className="flex items-center gap-1 w-28 py-1.5 bg-[#3CC19A] text-white rounded-md shadow-xs">
-                        <CircleCheck size={16} />
-                        <p>Uploaded</p>
-                      </div>
-                    ) : record.patientTest.status === "test_completed" ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-secondary bg-white w-28"
-                        onClick={() =>
-                          handleUpload(record.patientTest.patientTestId)
-                        }
-                      >
-                        <Upload /> Upload
-                      </Button>
-                    ) : (
-                      <span className="text-muted-foreground">N/A</span>
-                    )}
-                  </td>
-                  <td className="p-2">
-                    {record.patientTest.doctorId ? (
-                      <div className="flex items-center gap-1 w-28 py-1.5 bg-[#3CBEC1] text-white rounded-md shadow-xs justify-center">
-                        <CircleCheck size={16} />
-                        <p>Assigned</p>
-                      </div>
-                    ) : record.patientTest.status === "test_completed" ||
-                      record.patientTest.status === "report_ready" ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-32"
-                        onClick={() =>
-                          handleAssignDoctor(
-                            record.patient.patientId,
-                            record.patientTest.patientTestId
-                          )
-                        }
-                      >
-                        <ClipboardPlus className="mr-2 h-4 w-4" />
-                        Assign Doctor
-                      </Button>
-                    ) : (
-                      <span className="text-muted-foreground">N/A</span>
-                    )}
                   </td>
                 </tr>
               ))}
@@ -196,21 +127,6 @@ export default function PatientRecordsTable() {
           </table>
         )}
       </Card>
-      <AssignDoctorDialog
-        open={assignDialog.open}
-        onOpenChange={(open) =>
-          setAssignDialog({ open, patientId: null, patientTestId: null })
-        }
-        patientId={assignDialog.patientId || ""}
-        patientTestId={assignDialog.patientTestId || ""}
-        onAssignmentSuccess={fetchAllRecords}
-      />
-      <UploadReportDialog
-        isOpen={uploadDialog.open}
-        onClose={() => setUploadDialog({ open: false, patientTestId: null })}
-        patientTestId={uploadDialog.patientTestId || ""}
-        onStatusChange={fetchAllRecords}
-      />
     </>
   );
 }

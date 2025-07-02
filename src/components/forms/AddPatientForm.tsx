@@ -34,6 +34,7 @@ import { patientFormSchema, PatientFormType } from "@/lib/validations";
 import { Test } from "@/models/test";
 import { Package } from "@/models/package";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
 
 export default function AddPatientForm({
   tests,
@@ -55,10 +56,13 @@ export default function AddPatientForm({
       gender: "male",
       contactNumber: "",
       address: "",
+      consultationRequired: false,
+      bookingDate: undefined,
     },
   });
 
   async function onSubmit(values: PatientFormType) {
+    console.log("Values", values);
     try {
       const {
         success,
@@ -178,6 +182,47 @@ export default function AddPatientForm({
                       </SelectContent>
                     </Select>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="bookingDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Booking Date</FormLabel>
+                    <FormControl>
+                      <div className="w-full">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ?? undefined}
+                          onSelect={field.onChange}
+                          disabled={{ before: new Date() }}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="consultationRequired"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <Input
+                        type="checkbox"
+                        checked={field.value || false}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                        className="h-4 w-4 accent-primary"
+                      />
+                    </FormControl>
+                    <FormLabel className="mb-0">
+                      Doctor Consultation Required?
+                    </FormLabel>
                   </FormItem>
                 )}
               />
