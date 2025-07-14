@@ -26,6 +26,10 @@ export const sidebarData = {
           title: "Patient Actions",
           url: "/patients/actions",
         },
+        {
+          title: "Book Tests (Existing Patient)",
+          url: "/patients/book-tests",
+        },
       ],
     },
     {

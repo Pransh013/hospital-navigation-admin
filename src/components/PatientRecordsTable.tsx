@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Patient } from "@/models/patient";
 import { PatientTest } from "@/models/patientTest";
 import { Test } from "@/models/test";
+import { markPatientTestCompleteAction } from "@/actions/patientTest";
 
 export default function PatientRecordsTable() {
   const [isLoading, setIsLoading] = useState(true);
@@ -108,7 +109,35 @@ export default function PatientRecordsTable() {
                     {`${record.patient.firstName} ${record.patient.lastName}`}
                   </td>
                   <td className="p-2">{record.test.name}</td>
-                  <td className="p-2">{record.patientTest.status}</td>
+                  <td className="p-2">
+                    {record.patientTest.status === "test_completed" ? (
+                      <span className="text-green-600">Completed</span>
+                    ) : (
+                      <>
+                        <span className="text-yellow-600 mr-2 capitalize">
+                          {record.patientTest.status.replace("_", " ")}
+                        </span>
+                        <button
+                          className="ml-2 px-2 py-1 bg-primary text-white rounded text-xs hover:bg-primary/80"
+                          onClick={async () => {
+                            const res = await markPatientTestCompleteAction(
+                              record.patientTest.patientTestId
+                            );
+                            if (res.success) {
+                              toast.success("Marked as complete");
+                              fetchAllRecords();
+                            } else {
+                              toast.error(
+                                res.error || "Failed to mark as complete"
+                              );
+                            }
+                          }}
+                        >
+                          Mark as Complete
+                        </button>
+                      </>
+                    )}
+                  </td>
                   <td className="p-2">
                     {record.patient.bookingDate
                       ? new Date(

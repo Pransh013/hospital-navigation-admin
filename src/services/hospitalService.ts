@@ -25,4 +25,18 @@ export const hospitalService = {
       };
     }
   },
+  getById: async (hospitalId: string): Promise<ActionResponse<Hospital>> => {
+    try {
+      const hospital = await hospitalRepository.findById(hospitalId);
+      if (!hospital) {
+        return { success: false, error: "Hospital not found" };
+      }
+      return { success: true, data: hospital };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to fetch hospital",
+      };
+    }
+  },
 };

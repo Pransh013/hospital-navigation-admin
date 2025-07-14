@@ -1,6 +1,6 @@
 import dbClient, { hospitalsTable } from "@/lib/db/dynamodb";
 import { Hospital } from "@/models/hospital";
-import { ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { ScanCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 
 const HOSPITAL_PROJECTION = "hospitalId, hospitalName";
 
@@ -14,5 +14,14 @@ export const hospitalRepository = {
     );
 
     return (Items as Hospital[]) ?? [];
+  },
+  findById: async (hospitalId: string): Promise<Hospital | null> => {
+    const { Item } = await dbClient.send(
+      new GetCommand({
+        TableName: hospitalsTable,
+        Key: { hospitalId },
+      })
+    );
+    return Item ? (Item as Hospital) : null;
   },
 };

@@ -14,6 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { getCurrentAdminAction } from "@/actions/admin";
+import { getHospitalByIdAction } from "@/actions/hospital";
 
 export default async function DashboardLayout({
   children,
@@ -21,10 +22,15 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const { data: admin } = await getCurrentAdminAction();
+  let hospitalName = "";
+  if (admin?.hospitalId) {
+    const { data: hospital } = await getHospitalByIdAction(admin.hospitalId);
+    hospitalName = hospital?.hospitalName || "";
+  }
 
   return (
     <SidebarProvider>
-      <AppSidebar user={admin} />
+      <AppSidebar user={admin} hospitalName={hospitalName} />
       <SidebarInset className="overflow-hidden">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-white">
           <div className="flex items-center gap-2 px-4">

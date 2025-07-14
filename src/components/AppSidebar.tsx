@@ -20,9 +20,10 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
     name: string;
     email: string;
   };
+  hospitalName?: string;
 }
 
-export function AppSidebar({ user, ...props }: AppSidebarProps) {
+export function AppSidebar({ user, hospitalName, ...props }: AppSidebarProps) {
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -34,7 +35,9 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Thrive Daily</span>
+                  <span className="truncate font-medium">
+                    {hospitalName || "Thrive Daily"}
+                  </span>
                   <span className="truncate text-xs">Admin</span>
                 </div>
               </Link>

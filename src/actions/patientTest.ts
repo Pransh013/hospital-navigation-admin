@@ -8,14 +8,16 @@ import { getCurrentAdminAction } from "@/actions/admin";
 type AssignTestsInput = {
   patientId: string;
   testIds: string[];
+  bookingDate?: string;
 };
 
 export async function assignPatientTestsAction({
   patientId,
   testIds,
+  bookingDate,
 }: AssignTestsInput): Promise<ActionResponse<null>> {
   try {
-    await patientTestService.assignTests(testIds, patientId);
+    await patientTestService.assignTests(testIds, patientId, bookingDate);
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to assign tests." };
@@ -64,6 +66,18 @@ export async function getPatientTestsByHospitalAction(): Promise<
     return {
       success: false,
       error: err.message || "Failed to fetch patient tests by hospital.",
+    };
+  }
+}
+
+export async function markPatientTestCompleteAction(patientTestId: string) {
+  try {
+    await patientTestService.updateStatus(patientTestId, "test_completed");
+    return { success: true };
+  } catch (err: any) {
+    return {
+      success: false,
+      error: err.message || "Failed to mark test as complete.",
     };
   }
 }

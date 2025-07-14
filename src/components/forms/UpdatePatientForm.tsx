@@ -43,7 +43,6 @@ export default function UpdatePatientForm({ tests }: { tests: Test[] }) {
   const params = useParams();
   const patientId = params.patientId as string;
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedTests, setSelectedTests] = useState<string[]>([]);
 
   const form = useForm<PatientFormType>({
     resolver: zodResolver(patientFormSchema),
@@ -54,7 +53,6 @@ export default function UpdatePatientForm({ tests }: { tests: Test[] }) {
       gender: "male",
       contactNumber: "",
       address: "",
-      tests: [],
     },
   });
 
@@ -66,12 +64,6 @@ export default function UpdatePatientForm({ tests }: { tests: Test[] }) {
           data: patient,
           error: patientError,
         } = await getPatientAction(patientId);
-
-        const {
-          success: assignedTestsSuccess,
-          data: assignedTestsData,
-          error: assignedTestsError,
-        } = await getPatientTestsAction(patientId);
 
         if (patientSuccess && patient) {
           form.reset({
@@ -85,14 +77,6 @@ export default function UpdatePatientForm({ tests }: { tests: Test[] }) {
         } else {
           toast.error(patientError || "Patient not found");
           router.push("/patients");
-        }
-
-        if (assignedTestsSuccess && assignedTestsData) {
-          const assignedTestIds = assignedTestsData.map((test) => test.testId);
-          setSelectedTests(assignedTestIds);
-          form.setValue("tests", assignedTestIds);
-        } else {
-          toast.error(assignedTestsError || "Failed to load assigned tests");
         }
       } catch {
         toast.error("Failed to fetch data");
@@ -112,39 +96,6 @@ export default function UpdatePatientForm({ tests }: { tests: Test[] }) {
         toast.error(error || "Failed to update patient");
         return;
       }
-
-      const { data: initialTests } = await getPatientTestsAction(patientId);
-      const initialTestIds = initialTests?.map((test) => test.testId) || [];
-
-      const testsToAdd = selectedTests.filter(
-        (testId) => !initialTestIds.includes(testId)
-      );
-
-      const testsToRemove = initialTestIds.filter(
-        (testId) => !selectedTests.includes(testId)
-      );
-
-      if (testsToAdd.length > 0) {
-        const { success: addSuccess, error: addError } =
-          await assignPatientTestsAction({
-            patientId,
-            testIds: testsToAdd,
-          });
-        if (!addSuccess) {
-          toast.error(addError || "Failed to add some tests");
-          return;
-        }
-      }
-
-      for (const testId of testsToRemove) {
-        const { success: removeSuccess, error: removeError } =
-          await removePatientTestAction(patientId, testId);
-        if (!removeSuccess) {
-          toast.error(removeError || "Failed to remove some tests");
-          return;
-        }
-      }
-
       toast.success("Patient updated successfully");
       router.push("/patients");
     } catch {
@@ -168,7 +119,7 @@ export default function UpdatePatientForm({ tests }: { tests: Test[] }) {
         <CardHeader>
           <CardTitle>Update Patient</CardTitle>
           <CardDescription>
-            Update patient information and manage their tests
+            Update patient information
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -274,55 +225,6 @@ export default function UpdatePatientForm({ tests }: { tests: Test[] }) {
                   </FormItem>
                 )}
               />
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Test Management</h3>
-                <FormField
-                  control={form.control}
-                  name="tests"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Assign Tests</FormLabel>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                        {tests.map((test) => (
-                          <div
-                            key={test.testId}
-                            className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-accent cursor-pointer"
-                          >
-                            <Input
-                              type="checkbox"
-                              className="h-4 w-4"
-                              value={test.testId}
-                              checked={selectedTests.includes(test.testId)}
-                              onChange={(e) => {
-                                const testId = e.target.value;
-                                if (e.target.checked) {
-                                  const newSelectedTests = [
-                                    ...selectedTests,
-                                    testId,
-                                  ];
-                                  setSelectedTests(newSelectedTests);
-                                  form.setValue("tests", newSelectedTests);
-                                } else {
-                                  const newSelectedTests = selectedTests.filter(
-                                    (id) => id !== testId
-                                  );
-                                  setSelectedTests(newSelectedTests);
-                                  form.setValue("tests", newSelectedTests);
-                                }
-                              }}
-                            />
-                            <span className="text-sm font-medium">
-                              {test.name}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
 
               <div className="flex justify-end gap-4">
                 <Button

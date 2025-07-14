@@ -44,6 +44,10 @@ export const patientService = {
     return patientRepository.findById(patientId);
   },
 
+  getByEmail: async (email: string): Promise<Patient | null> => {
+    return patientRepository.findByEmail(email);
+  },
+
   getByHospitalId: async (hospitalId: string): Promise<Patient[]> => {
     return patientRepository.findByHospitalId(hospitalId);
   },

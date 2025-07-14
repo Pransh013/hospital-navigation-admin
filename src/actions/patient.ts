@@ -52,6 +52,20 @@ export async function getPatientAction(
   }
 }
 
+export async function getPatientByEmailAction(
+  email: string
+): Promise<ActionResponse<Patient>> {
+  try {
+    const patient = await patientService.getByEmail(email);
+    if (!patient) {
+      return { success: false, error: "Patient not found" };
+    }
+    return { success: true, data: patient };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to fetch patient" };
+  }
+}
+
 export async function updatePatientAction(
   patientId: string,
   data: PatientFormType

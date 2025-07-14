@@ -3,14 +3,24 @@ import { patientTestRepository } from "@/repositories/patientTestRepository";
 import { testRepository } from "@/repositories/testRepository";
 import { getCurrentAdminAction } from "@/actions/admin";
 import { PatientTest } from "@/models/patientTest";
+import { patientRepository } from "@/repositories/patientRepository";
 
 export const patientTestService = {
-  assignTests: async (testIds: string[], patientId: string): Promise<void> => {
+  assignTests: async (
+    testIds: string[],
+    patientId: string,
+    bookingDate?: string
+  ): Promise<void> => {
     const now = new Date().toISOString();
 
     const { success, data: admin } = await getCurrentAdminAction();
     if (!success || !admin?.hospitalId) {
       throw new Error("Hospital ID not found");
+    }
+
+    // Overwrite the patient's bookingDate with the new bookingDate
+    if (bookingDate) {
+      await patientRepository.update(patientId, { bookingDate });
     }
 
     const patientTestRecords: PatientTest[] = testIds.map((testId) => ({
@@ -21,6 +31,7 @@ export const patientTestService = {
       status: "assigned",
       createdAt: now,
       updatedAt: now,
+      bookingDate,
     }));
 
     await patientTestRepository.createMany(patientTestRecords);
@@ -49,13 +60,13 @@ export const patientTestService = {
     return patientTestRepository.findByHospitalId(hospitalId);
   },
 
-  // updateStatus: async (
-  //   patientTestId: string,
-  //   status: PatientTestStatus
-  // ): Promise<void> => {
-  //   await patientTestRepository.update(patientTestId, {
-  //     status,
-  //     updatedAt: new Date().toISOString(),
-  //   });
-  // },
+  updateStatus: async (
+    patientTestId: string,
+    status: "assigned" | "test_completed" | "cancelled"
+  ): Promise<void> => {
+    await patientTestRepository.update(patientTestId, {
+      status,
+      updatedAt: new Date().toISOString(),
+    });
+  },
 };
